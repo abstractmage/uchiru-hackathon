@@ -1,0 +1,44 @@
+@import './fonts.scss';
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-family: 'Noto Sans', sans-serif;
+  box-sizing: border-box;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.87);
+  height: 100%;
+
+  @media only screen and (min-width: 0) {
+    font-size: 14px;
+  }
+
+  @media only screen and (min-width: 992px) {
+    font-size: 14.5px;
+  }
+
+  @media only screen and (min-width: 1200px) {
+    font-size: 15px;
+  }
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::after,
+*::before {
+  font-family: inherit;
+  box-sizing: inherit;
+}
+
+#root {
+  position: relative;
+  height: 100%;
+}

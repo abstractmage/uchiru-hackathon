@@ -10,6 +10,7 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
+    "classnames": "^2.2.6",
     "lodash": "^4.17.20",
     "mobx": "^6.0.4",
     "mobx-react": "^7.0.5",
@@ -19,6 +20,7 @@
     "react-scripts": "4.0.1",
     "react-transition-group": "^4.4.1",
     "typescript": "^4.0.3",
+    "ua-parser-js": "^0.7.23",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
@@ -50,6 +52,7 @@
     "@types/lodash": "^4.14.166",
     "@types/react-router-dom": "^5.1.6",
     "@types/react-transition-group": "^4.4.0",
+    "@types/ua-parser-js": "^0.7.35",
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
     "eslint-config-airbnb": "^18.2.1",
@@ -62,7 +65,7 @@
     "eslint-plugin-prettier": "^3.3.0",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.2.0",
-    "node-sass": "^5.0.0",
+    "node-sass": "^4.14.1",
     "prettier": "^2.2.1",
     "react-app-rewired": "^2.1.8"
   }
