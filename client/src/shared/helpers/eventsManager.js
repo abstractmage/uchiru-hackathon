@@ -3,10 +3,7 @@ export default class QuizEventsManager {
   constructor(client, clientType, userName = '') {
     this.client = client;
     this.clientType = clientType;
-    this.currentQuestion = {
-      timer: -1,
-      index: -1
-    };
+    this.currentQuestionIndex = -1;
     this.quizData = null;
     this.quizActivated = false;
     this.userName = userName;
@@ -48,9 +45,8 @@ export default class QuizEventsManager {
     const { eventName } = messageObject;
     switch(eventName) {
       case 'show-question':
-        const { questionId, timer } = messageObject;
-        this.currentQuestion.timer = Number(timer);
-        this.currentQuestion.index = Number(questionId);
+        const { questionId } = messageObject;
+        this.currentQuestionIndex = Number(questionId);
         // по currentQuestion обновляется инфа на странице ученика
       case 'joined-to-quiz':
         this.quizData = messageObject.quizData;

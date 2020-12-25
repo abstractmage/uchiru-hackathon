@@ -33,11 +33,10 @@ class QuizRoom {
         this.teacher.send(this.convertMessage({ message: `Quiz ${quizId} is active!`}));
         break;
       case 'show-question':
-        const { questionId, timer } = messageObject;
+        const { questionId } = messageObject;
         this.notifyPupils({
           eventName: 'show-question',
           questionId: questionId,
-          timer: timer
         });
         this.teacher.send(this.convertMessage({ message: 'Pupils are notified!'}));
         break;
