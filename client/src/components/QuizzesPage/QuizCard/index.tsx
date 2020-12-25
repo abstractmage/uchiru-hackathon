@@ -29,7 +29,7 @@ export const QuizCard: React.FC<QuizCardProps> = (props) => {
   return (
     <div className={style.main}>
       <div className={style.previewContainer}>
-        <div className={style.preview} style={{ backgroundImage: preview }} />
+        <div className={style.preview} style={{ backgroundImage: `url(${preview})` }} />
       </div>
       <div className={style.contentContainer}>
         <div className={style.title}>

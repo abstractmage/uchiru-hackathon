@@ -97,6 +97,8 @@
 .preview {
   border-radius: 50%;
   background-color: #C4C4C4;
+  background-position: center;
+  background-size: contain;
 
   @media (min-width: 0) {
     width: 55px;

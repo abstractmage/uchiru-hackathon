@@ -11,8 +11,6 @@ export type CreateButtonProps = {
 export const CreateButton: React.FC<CreateButtonProps> = (props) => {
   const { disabled, onClick } = props;
 
-  console.log(onClick);
-
   return (
     <div
       className={cn(style.main, disabled && style.main_disabled)}
