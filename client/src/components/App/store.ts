@@ -1,8 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import { makeAutoObservable } from 'mobx';
 import Axios from 'axios';
-import { Item } from '../QuizCreatingPage/store';
 import { wait } from '~/shared/helpers/wait';
+import { Item } from '../QuizCreatingPage/store';
 
 export type Question = {
   _id: string;
@@ -78,6 +78,25 @@ export class AppStore {
     return pin;
   }
 
+  getQuizControlPageData(pin: number) {
+    const quiz = this.quizzes.find((q) => q.pin === pin);
+
+    if (!quiz) return null;
+
+    return {
+      id: quiz._id,
+      pin: quiz.pin,
+      title: quiz.title,
+      questions: quiz.questions.map((q, i) => ({
+        index: i,
+        id: q._id,
+        text: q.title,
+        preview: undefined,
+        answers: q.answers,
+      })),
+    };
+  }
+
   setPage(page: string) {
     this.page = page;
   }
@@ -127,8 +146,6 @@ export class AppStore {
 
     this.disabled = false;
     this.setPreloader(false, false);
-
-    console.log(res);
   };
 
   handleQuizzesChangeClick = (pin: number) => {
@@ -191,3 +208,20 @@ export class AppStore {
     });
   };
 }
+
+// axios.get('http://localhost:3001/teacher').then((res) => {
+//   const { quizess } = res.data;
+//   console.log('ALL QUIZESS', quizess);
+// });
+
+// axios.post('http://localhost:3001/teacher/edit/1111', {
+//   pin: 1111,
+//   updated: {
+//     title: 'UPDATED TITLE',
+//   },
+// });
+
+// axios.get('http://localhost:3001/quiz/1111').then((res) => {
+//   const { quiz } = res.data;
+//   console.log('SINGLE QUIZ', quiz);
+// });

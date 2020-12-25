@@ -8,6 +8,8 @@ import { AppStore } from './store';
 import { Preloader } from '../Preloader';
 import { QuizzesPage } from '../QuizzesPage';
 import { QuizCreatingPage } from '../QuizCreatingPage';
+import { QuizControlPageStore } from '../QuizControlPage/store';
+import { QuizControlPage } from '../QuizControlPage';
 
 const useRouting = (page: string) => {
   const history = useHistory();
@@ -44,7 +46,7 @@ export const App = observer(function App() {
               onChangeClick={store.handleQuizzesChangeClick}
             />
           </Route>
-          <Route path="/teacher/quizzes/:id">
+          <Route path="/teacher/quizzes/:id" exact>
             {({ match }) => {
               const id = match?.params.id;
 
@@ -60,6 +62,15 @@ export const App = observer(function App() {
                   onSaveClick={store.handleQuizSave}
                 />
               );
+            }}
+          </Route>
+          <Route path="/teacher/play/:pin" exact>
+            {({ match }) => {
+              const pin = match?.params.pin;
+
+              if (pin === null || pin === undefined) return null;
+
+              return <QuizControlPage quiz={store.getQuizControlPageData(+pin)!} />;
             }}
           </Route>
           <Route path="/student" exact>

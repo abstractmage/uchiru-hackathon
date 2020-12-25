@@ -10,23 +10,6 @@ import { QuestionHead } from './QuestionHead';
 import { QuestionItem } from './QuestionItem';
 import { QuizCreatingPageStore, Item } from './store';
 
-// axios.get('http://localhost:3001/teacher').then((res) => {
-//   const { quizess } = res.data;
-//   console.log('ALL QUIZESS', quizess);
-// });
-
-// axios.post('http://localhost:3001/teacher/edit/1111', {
-//   pin: 1111,
-//   updated: {
-//     title: 'UPDATED TITLE',
-//   },
-// });
-
-// axios.get('http://localhost:3001/quiz/1111').then((res) => {
-//   const { quiz } = res.data;
-//   console.log('SINGLE QUIZ', quiz);
-// });
-
 export type QuizCreatingPageProps = {
   quiz: {
     id: string;
