@@ -75,7 +75,10 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
               onChangeName={store.handleItemChangeTitle}
               onChangeTime={store.handleItemChangeTime}
             />
-            <Preview />
+            <Preview
+              file={store.selectedItem.preview}
+              onSelectFile={({ base64 }) => store.handleSelectPreview(base64)}
+            />
             <div className={style.selectButtonsWrap}>
               <div className={style.selectButtonsGrid}>
                 <div className={style.selectButtonsInner}>

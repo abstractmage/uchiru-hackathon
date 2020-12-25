@@ -136,4 +136,10 @@ export class QuizCreatingPageStore {
       v.selected = true;
     }
   };
+
+  handleSelectPreview = (file: string | null) => {
+    if (this.selectedItem) {
+      this.selectedItem.preview = file || undefined;
+    }
+  };
 }
