@@ -184,7 +184,7 @@ export class AppStore {
       }),
       wait(1000),
     ]).then(() => {
-      this.setPreloader(true, false);
+      this.setPreloader(false, false);
       this.setDisabled(false);
       this.setPage('/teacher/quizzes');
     });
