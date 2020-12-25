@@ -118,4 +118,22 @@ export class QuizCreatingPageStore {
 
     this.items.push(newItem);
   };
+
+  handleChangeItemVariantValue = (variant: string, value: string) => {
+    if (this.selectedItem) {
+      const v = this.selectedItem.variants.find((currVariant) => currVariant.variant === variant)!;
+      v.value = value;
+    }
+  };
+
+  handleSelectItemVariant = (variant: string) => {
+    if (this.selectedItem) {
+      const v = this.selectedItem.variants.find((currVariant) => currVariant.variant === variant)!;
+      this.selectedItem.variants.forEach((currVariant) => {
+        // eslint-disable-next-line no-param-reassign
+        currVariant.selected = false;
+      });
+      v.selected = true;
+    }
+  };
 }

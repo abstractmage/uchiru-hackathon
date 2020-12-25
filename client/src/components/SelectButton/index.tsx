@@ -18,6 +18,7 @@ export type SelectButtonProps = {
 
 export const SelectButton: React.FC<SelectButtonProps> = (props) => {
   const { variant, value, color, selected, editable, onChange, onClick, disabled } = props;
+  const ref = React.useRef<Transition<HTMLElement | undefined> | null>();
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +60,7 @@ export const SelectButton: React.FC<SelectButtonProps> = (props) => {
             <div className={cn(style.radioInner)}>
               <EmptyRadioSVG />
             </div>
-            <Transition in={selected} timeout={200}>
+            <Transition ref={ref as any} in={selected} timeout={200}>
               {(transitionState) => (
                 <div className={cn(style.radioInner, style[`radioInner_${transitionState}`])}>
                   <CheckMarkSVG />

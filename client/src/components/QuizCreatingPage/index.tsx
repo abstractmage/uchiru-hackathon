@@ -82,8 +82,8 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
                         selected={v.selected}
                         editable
                         disabled={false}
-                        onChange={undefined}
-                        onClick={undefined}
+                        onChange={(val) => store.handleChangeItemVariantValue(v.variant, val)}
+                        onClick={() => store.handleSelectItemVariant(v.variant)}
                       />
                     </div>
                   ))}
