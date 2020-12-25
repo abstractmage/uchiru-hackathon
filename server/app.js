@@ -1,5 +1,4 @@
 
-require('./models/quiz');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -18,7 +17,7 @@ kahootDb.once("open", function() {
   console.log("MongoDB database connection established successfully");
 });
 
-const mainRouter = router.getRouter(kahootDb);
+const mainRouter = router.getRouter(kahootDb.collection('Quizess'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());

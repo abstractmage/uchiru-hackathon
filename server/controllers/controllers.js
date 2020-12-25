@@ -21,23 +21,24 @@ const controllers = (collection) => {
   };
 
   const getQuiz = async (req, res, next) => {
-    if (req.body.pin) {
+    const { quizId } = req.params;
+    if (quizId) {
       try {
-        const result = await collection.findOne({ pin: req.body.pin });
+        const result = await collection.findOne({ pin: Number(quizId) });
         if (result) {
-          return res.json({ success: false, error: err });
+          return res.json({ success: false, quiz: result });
         }
       } catch (err) {
-      return res.json({ success: true, quiz: data });
+        return res.json({ success: false, error: err });
       }
     }
   };
 
   const getAllQuizess = async (req, res, next) => {
     try {
-      const quizzesCursor = await quizzesCollection.find();
+      const quizzesCursor = await collection.find({});
       const result = [];
-      quizzesCursor.forEach((value) => {
+      await quizzesCursor.forEach((value) => {
         result.push(value);
       });
       return res.json({ success: true, quizess: result });
@@ -48,10 +49,11 @@ const controllers = (collection) => {
 
   const updateQuiz = async (req, res, next) => {
     try {
-      const { update, pin } = req.body;
-      const filter = { pin: pin };
+      const { quizId } = req.params;
+      const { updated } = req.body;
+      const filter = { pin: Number(quizId) };
       const updateDoc = {
-        $set: update
+        $set: updated
       };
       await collection.updateOne(filter, updateDoc);
     } catch(err) {
