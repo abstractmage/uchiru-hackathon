@@ -23,7 +23,6 @@ class QuizRoom {
       }
     });
     client.on('error', e => ws.send(e));
-    client.send('Hi there, I am a WebSocket server');
   }
 
   handleTeacherEvents(messageObject) {
@@ -31,6 +30,7 @@ class QuizRoom {
     switch (eventName) {
       case 'launch-quiz':
         this.activeQuizess[quizId] = true;
+        this.teacher.send(this.convertMessage({ message: `Quiz ${quizId} is active!`}));
         break;
       case 'show-question':
         const { questionId, timer } = messageObject;
@@ -39,7 +39,7 @@ class QuizRoom {
           questionId: questionId,
           timer: timer
         });
-        this.teacher.send('Pupils are notified!');
+        this.teacher.send(this.convertMessage({ message: 'Pupils are notified!'}));
         break;
       default:
         break;
