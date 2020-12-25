@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Switch } from 'react-router-dom';
+import { QuizCreatingPage } from '../QuizCreatingPage';
 import { QuizzesPage } from '../QuizzesPage';
 
 const quizzes = [
@@ -30,7 +31,7 @@ export const TeacherApp: React.FC = () => {
 
   return (
     <Switch>
-      <Route path="/quizzes" exact>
+      {/* <Route path="/teacher/quizzes" exact>
         <QuizzesPage
           locked={false}
           quizzes={quizzes}
@@ -39,6 +40,9 @@ export const TeacherApp: React.FC = () => {
           onChangeClick={handleChangeClick}
         />
       </Route>
+      <Route path="/teacher/quiz/:id"> */}
+      <QuizCreatingPage />
+      {/* </Route> */}
     </Switch>
   );
 };
