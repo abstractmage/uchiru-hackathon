@@ -22,6 +22,8 @@ export type Quiz = {
 export class AppStore {
   loaded = false;
 
+  disabled = false;
+
   preloader = {
     shown: true,
     visibility: true,
@@ -63,6 +65,18 @@ export class AppStore {
     }));
   }
 
+  getAvailablePin() {
+    const pins = this.quizzes.map((q) => q.pin);
+    const minPin = Math.min(...pins);
+    let pin: number;
+
+    do {
+      pin = minPin + 1;
+    } while (pins.includes(pin));
+
+    return pin;
+  }
+
   setPage(page: string) {
     this.page = page;
   }
@@ -83,8 +97,40 @@ export class AppStore {
     });
   }
 
-  handleQuizzesCreateClick = () => {
-    // this.setPage('/teacher/quizzez');
+  setPreloader(shown: boolean, visibility: boolean) {
+    this.preloader = { shown, visibility };
+  }
+
+  setDisabled(value: boolean) {
+    this.disabled = value;
+  }
+
+  handleQuizzesCreateClick = async () => {
+    this.disabled = true;
+    this.setPreloader(true, false);
+
+    const [res] = await Promise.all([
+      Axios.post('http://localhost:3001/teacher/add', {
+        pin: this.getAvailablePin(),
+        title: 'Моя викторина',
+        preview: '',
+        questions: [
+          {
+            title: '',
+            image: undefined,
+            answers: ['', '', '', ''],
+            rightAnswer: 0,
+            timeLimit: 20,
+          },
+        ],
+      }),
+      wait(1000),
+    ]);
+
+    this.disabled = false;
+    this.setPreloader(false, false);
+
+    console.log(res);
   };
 
   handleQuizzesChangeClick = (id: string) => {
@@ -95,7 +141,30 @@ export class AppStore {
     this.setPage(`/teacher/control/${id}`);
   };
 
-  handleQuizSave = (params: { name: string; items: Item[] }) => {
-    console.log(params);
+  handleQuizSave = ({ name, items }: { name: string; items: Item[] }) => {
+    this.preloader = {
+      shown: true,
+      visibility: false,
+    };
+
+    Promise.all([
+      Axios.post('http://localhost:3001/teacher/add', {
+        pin: 2222,
+        title: name,
+        preview: '',
+        questions: items.map((item) => ({
+          title: item.title,
+          image: item.preview || '',
+          answers: item.variants.map((v) => v.value),
+          rightAnswer: item.variants.findIndex((v) => v.selected),
+          timeLimit: +item.time,
+        })),
+      }),
+      wait(1000),
+    ]).then(() => {
+      this.setPreloader(true, false);
+      this.setDisabled(false);
+      this.setPage('/teacher/quizzes');
+    });
   };
 }
