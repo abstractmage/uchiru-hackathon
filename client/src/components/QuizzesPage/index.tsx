@@ -3,9 +3,9 @@ import { QuizCard } from './QuizCard';
 import { CreateButton } from './CreateButton';
 import style from './index.module.scss';
 
-type Quiz = {
+export type Quiz = {
   id: string;
-  preview: string;
+  preview?: string;
   title: string;
   taskCount: number;
 };
