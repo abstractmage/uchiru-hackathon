@@ -6,7 +6,7 @@ import { ReactComponent as CloudSVG } from './svg/Cloud.svg';
 
 export type PreviewProps = {
   file?: string;
-  onSelectFile?: (obj: { name: string; base64: string | ArrayBuffer }) => void;
+  onSelectFile?: (obj: { name: string; base64: string }) => void;
 };
 
 export const Preview: React.FC<PreviewProps> = (props) => {

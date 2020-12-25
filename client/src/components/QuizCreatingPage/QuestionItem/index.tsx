@@ -5,7 +5,7 @@ import style from './index.module.scss';
 export type QuestionItemProps = {
   index: number;
   title: string;
-  preview?: string;
+  preview?: string | ArrayBuffer;
   selected?: boolean;
   disabled?: boolean;
   onClick?: (index: number) => void;
