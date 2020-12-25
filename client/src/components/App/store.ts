@@ -84,10 +84,7 @@ export class AppStore {
   setLoadedData(quizzes: Quiz[]) {
     this.loaded = true;
     this.quizzes = quizzes;
-    this.preloader = {
-      shown: false,
-      visibility: false,
-    };
+    this.setPreloader(false, true);
   }
 
   fetchData() {
@@ -141,24 +138,49 @@ export class AppStore {
     this.setPage(`/teacher/control/${id}`);
   };
 
-  handleQuizSave = ({ name, items }: { name: string; items: Item[] }) => {
+  handleQuizSave = ({
+    id,
+    pin,
+    name,
+    items,
+  }: {
+    id: string;
+    pin: number;
+    name: string;
+    items: Item[];
+  }) => {
     this.preloader = {
       shown: true,
       visibility: false,
     };
 
+    const quiz = this.quizzes.find((q) => q._id === id);
+
+    if (!quiz) return;
+
+    quiz.title = name;
+    quiz.questions = quiz.questions.map((q, i) => ({
+      ...q,
+      title: items[i].title,
+      answers: items[i].variants.map((v) => v.value),
+      rightAnswer: items[i].variants.findIndex((v) => v.selected),
+      timeLimit: +items[i].time,
+    }));
+
     Promise.all([
-      Axios.post('http://localhost:3001/teacher/add', {
-        pin: 2222,
-        title: name,
-        preview: '',
-        questions: items.map((item) => ({
-          title: item.title,
-          image: item.preview || '',
-          answers: item.variants.map((v) => v.value),
-          rightAnswer: item.variants.findIndex((v) => v.selected),
-          timeLimit: +item.time,
-        })),
+      Axios.post(`http://localhost:3001/teacher/edit/${pin}`, {
+        pin,
+        updated: {
+          title: name,
+          preview: items[0].preview || '',
+          questions: items.map((item) => ({
+            title: item.title,
+            image: item.preview || '',
+            answers: item.variants.map((v) => v.value),
+            rightAnswer: item.variants.findIndex((v) => v.selected),
+            timeLimit: +item.time,
+          })),
+        },
       }),
       wait(1000),
     ]).then(() => {

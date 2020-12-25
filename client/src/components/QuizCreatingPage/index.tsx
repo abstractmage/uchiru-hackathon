@@ -29,11 +29,13 @@ import { QuizCreatingPageStore, Item } from './store';
 
 export type QuizCreatingPageProps = {
   quiz: {
+    id: string;
+    pin: number;
     name: string;
     items: Item[];
   };
   disabled?: boolean;
-  onSaveClick?: (params: { name: string; items: Item[] }) => void;
+  onSaveClick?: (params: { id: string; pin: number; name: string; items: Item[] }) => void;
 };
 
 const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'orange', 'purple'];
@@ -57,8 +59,9 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
   );
 
   const handleSaveClick = React.useCallback(() => {
-    if (onSaveClick) onSaveClick({ name: store.name, items: store.items });
-  }, [onSaveClick, store.items, store.name]);
+    if (onSaveClick)
+      onSaveClick({ id: quiz.id, pin: quiz.pin, name: store.name, items: store.items });
+  }, [onSaveClick, quiz.id, quiz.pin, store.items, store.name]);
 
   return (
     <div className={style.main}>
@@ -102,7 +105,7 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
             />
             <Preview
               file={store.selectedItem.preview}
-              onSelectFile={({ base64 }) => store.handleSelectPreview(base64)}
+              onSelectFile={(result) => store.handleSelectPreview(result && result.base64)}
             />
             <div className={style.selectButtonsWrap}>
               <div className={style.selectButtonsGrid}>

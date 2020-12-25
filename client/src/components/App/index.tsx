@@ -37,7 +37,7 @@ export const App = observer(function App() {
         <Switch>
           <Route path="/teacher/quizzes" exact>
             <QuizzesPage
-              locked={false}
+              locked={store.disabled}
               quizzes={store.teacherAppData}
               onCreateClick={store.handleQuizzesCreateClick}
               onStartClick={store.handleQuizzesStartClick}
@@ -55,8 +55,8 @@ export const App = observer(function App() {
 
               return (
                 <QuizCreatingPage
-                  quiz={{ name: quiz.title, items }}
-                  disabled={false}
+                  quiz={{ id: quiz._id, pin: quiz.pin, name: quiz.title, items }}
+                  disabled={store.disabled}
                   onSaveClick={store.handleQuizSave}
                 />
               );

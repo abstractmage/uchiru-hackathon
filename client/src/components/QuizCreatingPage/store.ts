@@ -70,17 +70,17 @@ export class QuizCreatingPageStore {
   }
 
   handleChangeName = (name: string) => {
-    this.name = name;
+    if (name.length <= 84) this.name = name;
   };
 
   handleItemChangeTime = (time: string) => {
-    if (this.selectedItem) {
-      this.selectedItem.time = time;
+    if (this.selectedItem && time.length <= 2) {
+      this.selectedItem.time = time.replace(/\D+/g, '');
     }
   };
 
   handleItemChangeTitle = (title: string) => {
-    if (this.selectedItem) {
+    if (this.selectedItem && title.length <= 140) {
       this.selectedItem.title = title;
     }
   };
@@ -124,7 +124,7 @@ export class QuizCreatingPageStore {
   };
 
   handleChangeItemVariantValue = (variant: string, value: string) => {
-    if (this.selectedItem) {
+    if (this.selectedItem && value.length <= 32) {
       const v = this.selectedItem.variants.find((currVariant) => currVariant.variant === variant)!;
       v.value = value;
     }
