@@ -1,5 +1,5 @@
 import React from 'react';
-import { observer, useLocalStore } from 'mobx-react';
+import { observer, useLocalObservable } from 'mobx-react';
 import Scrollbars from 'react-custom-scrollbars';
 import { Button } from '../Button';
 import { SelectButton } from '../SelectButton';
@@ -11,18 +11,37 @@ import { QuestionItem } from './QuestionItem';
 import { QuizCreatingPageStore } from './store';
 
 export type QuizCreatingPageProps = {
-  pin: string;
-  onSaveClick: (pin: string) => void;
+  onSaveClick?: () => void;
 };
 
-export const QuizCreatingPage = observer(function QuizCreatingPage() {
-  const store = useLocalStore(() => new QuizCreatingPageStore());
+const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'orange', 'purple'];
+
+export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(function QuizCreatingPage(
+  props,
+) {
+  const { onSaveClick } = props;
+  const store = useLocalObservable(() => new QuizCreatingPageStore());
+
+  const handleChangeQuizName = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.currentTarget;
+      store.handleChangeName(value);
+    },
+    [store],
+  );
 
   return (
     <div className={style.main}>
       <div className={style.quizName}>
-        <input className={style.quizInput} placeholder="Название викторины" />
-        <Button className={style.quizButton}>Сохранить</Button>
+        <input
+          className={style.quizInput}
+          placeholder="Название викторины"
+          value={store.name}
+          onChange={handleChangeQuizName}
+        />
+        <Button className={style.quizButton} onClick={onSaveClick}>
+          Сохранить
+        </Button>
       </div>
       <div className={style.mainContainer}>
         <div className={style.questionListContainerWrapper}>
@@ -34,38 +53,45 @@ export const QuizCreatingPage = observer(function QuizCreatingPage() {
                   index={item.index}
                   title={item.title}
                   preview={item.preview}
-                  selected={item.selected}
+                  selected={item.index === store.selected}
                   onClick={store.handleItemClick}
                 />
               ))}
-              <AddButton onClick={() => console.log('add button click')} disabled={false} />
+              <AddButton onClick={store.handleAddClick} disabled={false} />
             </Scrollbars>
           </div>
         </div>
-        <div className={style.questionContainer}>
-          <QuestionHead />
-          <Preview />
-          <div className={style.selectButtonsWrap}>
-            <div className={style.selectButtonsGrid}>
-              <div className={style.selectButtonsInner}>
-                {/* {new Array(4).fill(null).map((item) => (
-                  <div key={item.variant} className={style.selectButton}>
-                    <SelectButton
-                      variant={item.variant}
-                      value={item.value}
-                      color={item.color as 'blue' | 'green' | 'orange' | 'purple'}
-                      selected={item.selected}
-                      editable={item.editable}
-                      disabled={item.disabled}
-                      onChange={item.onChange}
-                      onClick={item.onClick}
-                    />
-                  </div>
-                ))} */}
+        {store.selectedItem && (
+          <div className={style.questionContainer}>
+            <QuestionHead
+              nameValue={store.selectedItem.title}
+              timeValue={store.selectedItem.time}
+              onChangeName={store.handleItemChangeTitle}
+              onChangeTime={store.handleItemChangeTime}
+            />
+            <Preview />
+            <div className={style.selectButtonsWrap}>
+              <div className={style.selectButtonsGrid}>
+                <div className={style.selectButtonsInner}>
+                  {store.selectedItem.variants.map((v, i) => (
+                    <div key={v.variant} className={style.selectButton}>
+                      <SelectButton
+                        variant={v.variant}
+                        value={v.value}
+                        color={colors[i]}
+                        selected={v.selected}
+                        editable
+                        disabled={false}
+                        onChange={undefined}
+                        onClick={undefined}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

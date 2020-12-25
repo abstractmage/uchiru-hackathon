@@ -14,17 +14,20 @@ export type QuestionHeadProps = {
 export const QuestionHead: React.FC<QuestionHeadProps> = (props) => {
   const { disabled, nameValue, timeValue, onChangeName, onChangeTime } = props;
 
-  const createInputChangeHandler = React.useCallback(
-    (type: 'name' | 'time') => {
-      return (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = e.currentTarget;
-
-        if (type === 'name' && disabled && onChangeName) onChangeName(value);
-
-        if (type === 'time' && disabled && onChangeTime) onChangeTime(value);
-      };
+  const handleChangeName = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.currentTarget;
+      if (onChangeName) onChangeName(value);
     },
-    [disabled, onChangeName, onChangeTime],
+    [onChangeName],
+  );
+
+  const handleChangeTime = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.currentTarget;
+      if (onChangeTime) onChangeTime(value);
+    },
+    [onChangeTime],
   );
 
   return (
@@ -34,7 +37,7 @@ export const QuestionHead: React.FC<QuestionHeadProps> = (props) => {
           className={style.input}
           type="text"
           placeholder="Введите вопрос..."
-          onChange={createInputChangeHandler('name')}
+          onChange={handleChangeName}
           value={nameValue}
         />
       </div>
@@ -42,12 +45,7 @@ export const QuestionHead: React.FC<QuestionHeadProps> = (props) => {
         <div className={style.timer}>
           <TimerSVG />
         </div>
-        <input
-          className={style.input}
-          type="text"
-          onChange={createInputChangeHandler('time')}
-          value={timeValue}
-        />
+        <input className={style.input} type="text" onChange={handleChangeTime} value={timeValue} />
       </div>
     </div>
   );
