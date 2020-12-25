@@ -28,6 +28,10 @@ import { QuizCreatingPageStore, Item } from './store';
 // });
 
 export type QuizCreatingPageProps = {
+  quiz: {
+    name: string;
+    items: Item[];
+  };
   disabled?: boolean;
   onSaveClick?: (params: { name: string; items: Item[] }) => void;
 };
@@ -37,8 +41,12 @@ const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'or
 export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(function QuizCreatingPage(
   props,
 ) {
-  const { onSaveClick, disabled } = props;
+  const { quiz, onSaveClick, disabled } = props;
   const store = useLocalObservable(() => new QuizCreatingPageStore());
+
+  React.useEffect(() => {
+    store.load(quiz);
+  }, [quiz, store]);
 
   const handleChangeQuizName = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

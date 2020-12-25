@@ -11,7 +11,6 @@ export type Item = {
   title: string;
   time: string;
   preview?: string;
-  selected?: boolean;
   variants: Variant[];
 };
 
@@ -63,6 +62,11 @@ export class QuizCreatingPageStore {
       handleItemChangeTitle: action,
       handleAddClick: action,
     });
+  }
+
+  load({ name, items }: { name: string; items: Item[] }) {
+    this.name = name;
+    this.items = items;
   }
 
   handleChangeName = (name: string) => {
