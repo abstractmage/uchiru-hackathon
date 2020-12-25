@@ -1,4 +1,4 @@
-const { collection } = require("../models/quiz");
+const Quiz= require('../models/quiz');
 
 const controllers = (collection) => {
 
@@ -14,9 +14,7 @@ const controllers = (collection) => {
         });
       }
     } catch (err) {
-      let errors=result.mapped(), error_msg='';
-      for(let key in errors) error_msg+=`${errors[key].msg}\n`;
-      next(new Error(error_msg));
+      next(new Error(err));
     }
   };
 
