@@ -1,6 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 import { makeAutoObservable } from 'mobx';
 import Axios from 'axios';
+import { Item } from '../QuizCreatingPage/store';
+import { wait } from '~/shared/helpers/wait';
 
 export type Question = {
   _id: string;
@@ -18,9 +20,14 @@ export type Quiz = {
 };
 
 export class AppStore {
-  loading = true;
+  loaded = false;
 
-  page = '/teacher/quizzes';
+  preloader = {
+    shown: true,
+    visibility: true,
+  };
+
+  page = window.location.pathname;
 
   quizzes: Quiz[] = [];
 
@@ -61,13 +68,17 @@ export class AppStore {
   }
 
   setLoadedData(quizzes: Quiz[]) {
+    this.loaded = true;
     this.quizzes = quizzes;
-    this.loading = false;
+    this.preloader = {
+      shown: false,
+      visibility: false,
+    };
   }
 
   fetchData() {
-    Axios.get('http://localhost:3001/teacher').then((res) => {
-      const { quizess } = res.data;
+    Promise.all([Axios.get('http://localhost:3001/teacher'), wait(500)]).then(([{ data }]) => {
+      const { quizess } = data;
       this.setLoadedData(quizess);
     });
   }
@@ -82,5 +93,9 @@ export class AppStore {
 
   handleQuizzesStartClick = (id: string) => {
     this.setPage(`/teacher/control/${id}`);
+  };
+
+  handleQuizSave = (params: { name: string; items: Item[] }) => {
+    console.log(params);
   };
 }

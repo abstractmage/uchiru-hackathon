@@ -33,7 +33,7 @@ export const App = observer(function App() {
 
   return (
     <div className={style.main}>
-      {!store.loading && (
+      {store.loaded && (
         <Switch>
           <Route path="/teacher/quizzes" exact>
             <QuizzesPage
@@ -53,7 +53,13 @@ export const App = observer(function App() {
               const quiz = store.quizzes.find((q) => q._id === id)!;
               const items = store.getQuizCreatingPageItems(id)!;
 
-              return <QuizCreatingPage quiz={{ name: quiz.title, items }} />;
+              return (
+                <QuizCreatingPage
+                  quiz={{ name: quiz.title, items }}
+                  disabled={false}
+                  onSaveClick={store.handleQuizSave}
+                />
+              );
             }}
           </Route>
           <Route path="/student" exact>
@@ -62,7 +68,7 @@ export const App = observer(function App() {
           <Route>Error</Route>
         </Switch>
       )}
-      <Preloader shown={store.loading} />
+      <Preloader shown={store.preloader.shown} visibility={store.preloader.visibility} />
     </div>
   );
 });

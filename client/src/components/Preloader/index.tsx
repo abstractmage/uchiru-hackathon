@@ -6,10 +6,11 @@ import { ReactComponent as PreloaderSVG } from './svg/Preloader.svg';
 
 export type PreloaderProps = {
   shown?: boolean;
+  visibility?: boolean;
 };
 
 export const Preloader: React.FC<PreloaderProps> = (props) => {
-  const { shown } = props;
+  const { shown, visibility } = props;
   const ref = React.useRef<HTMLDivElement>(null);
 
   return (
@@ -22,7 +23,10 @@ export const Preloader: React.FC<PreloaderProps> = (props) => {
       unmountOnExit
     >
       {(state) => (
-        <div ref={ref} className={cn(style.main, style[`main_${state}`])}>
+        <div
+          ref={ref}
+          className={cn(style.main, style[`main_${state}`], visibility && style.main_visibility)}
+        >
           <div className={style.loader}>
             <PreloaderSVG />
           </div>
