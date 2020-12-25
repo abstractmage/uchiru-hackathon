@@ -2,9 +2,11 @@ import React from 'react';
 import { QuizCard } from './QuizCard';
 import { CreateButton } from './CreateButton';
 import style from './index.module.scss';
+import QuizEventsManager from '../../shared/helpers/eventsManager';
 
 export type Quiz = {
   id: string;
+  pin: number;
   preview?: string;
   title: string;
   taskCount: number;
@@ -14,23 +16,29 @@ export type QuizzesPageProps = {
   locked: boolean;
   quizzes: Quiz[];
   onCreateClick: () => void;
-  onStartClick: (id: string) => void;
-  onChangeClick: (id: string) => void;
+  onStartClick: (pin: number) => void;
+  onChangeClick: (pin: number) => void;
 };
 
 export const QuizzesPage: React.FC<QuizzesPageProps> = (props) => {
   const { locked, quizzes, onChangeClick, onCreateClick, onStartClick } = props;
 
+  const client = new WebSocket("ws://localhost:3001");
+  const quizEventsManager = new QuizEventsManager(client, 'teacher');
+
   const createStartClickHandler = React.useCallback(
-    (id: string) => {
-      return () => onStartClick(id);
+    (pin: number) => {
+      return () => {
+        onStartClick(pin);
+        quizEventsManager.launchQuiz(pin);
+      };
     },
     [onStartClick],
   );
 
   const createChangeClickHandler = React.useCallback(
-    (id: string) => {
-      return () => onChangeClick(id);
+    (pin: number) => {
+      return () => onChangeClick(pin);
     },
     [onChangeClick],
   );
@@ -47,8 +55,8 @@ export const QuizzesPage: React.FC<QuizzesPageProps> = (props) => {
                   taskCount={quiz.taskCount}
                   preview={quiz.preview}
                   disabled={locked}
-                  onStartButtonClick={createStartClickHandler(quiz.id)}
-                  onChangeButtonClick={createChangeClickHandler(quiz.id)}
+                  onStartButtonClick={createStartClickHandler(quiz.pin)}
+                  onChangeButtonClick={createChangeClickHandler(quiz.pin)}
                 />
               </div>
             ))}

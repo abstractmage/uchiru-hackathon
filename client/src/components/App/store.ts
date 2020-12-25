@@ -37,6 +37,7 @@ export class AppStore {
     return this.quizzes.map((quiz) => ({
       // eslint-disable-next-line no-underscore-dangle
       id: quiz._id,
+      pin: quiz.pin,
       preview: undefined,
       title: quiz.title,
       taskCount: quiz.questions.length,
@@ -130,12 +131,12 @@ export class AppStore {
     console.log(res);
   };
 
-  handleQuizzesChangeClick = (id: string) => {
-    this.setPage(`/teacher/quizzes/${id}`);
+  handleQuizzesChangeClick = (pin: number) => {
+    this.setPage(`/teacher/quizzes/${pin}`);
   };
 
-  handleQuizzesStartClick = (id: string) => {
-    this.setPage(`/teacher/control/${id}`);
+  handleQuizzesStartClick = (pin: number) => {
+    this.setPage(`/teacher/control/${pin}`);
   };
 
   handleQuizSave = ({
