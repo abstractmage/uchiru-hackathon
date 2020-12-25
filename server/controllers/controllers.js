@@ -24,7 +24,7 @@ const controllers = (collection) => {
       try {
         const result = await collection.findOne({ pin: Number(quizId) });
         if (result) {
-          return res.json({ success: false, quiz: result });
+          return res.json({ success: true, quiz: result });
         }
       } catch (err) {
         return res.json({ success: false, error: err });
@@ -54,6 +54,10 @@ const controllers = (collection) => {
         $set: updated
       };
       await collection.updateOne(filter, updateDoc);
+      return res.status(200).json({
+        success: true,
+        message:'Quiz updated!',
+      });
     } catch(err) {
       return res.json({ success: false, error: err });
     }
