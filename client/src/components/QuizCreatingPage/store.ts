@@ -1,12 +1,12 @@
 import { action, makeAutoObservable } from 'mobx';
 
-type Variant = {
+export type Variant = {
   variant: string;
   value: string;
   selected: boolean;
 };
 
-type Item = {
+export type Item = {
   index: number;
   title: string;
   time: string;

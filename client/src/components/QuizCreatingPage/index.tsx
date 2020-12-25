@@ -8,10 +8,11 @@ import style from './index.module.scss';
 import { Preview } from './Preview';
 import { QuestionHead } from './QuestionHead';
 import { QuestionItem } from './QuestionItem';
-import { QuizCreatingPageStore } from './store';
+import { QuizCreatingPageStore, Item } from './store';
 
 export type QuizCreatingPageProps = {
-  onSaveClick?: () => void;
+  disabled?: boolean;
+  onSaveClick?: (params: { name: string; items: Item[] }) => void;
 };
 
 const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'orange', 'purple'];
@@ -19,7 +20,7 @@ const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'or
 export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(function QuizCreatingPage(
   props,
 ) {
-  const { onSaveClick } = props;
+  const { onSaveClick, disabled } = props;
   const store = useLocalObservable(() => new QuizCreatingPageStore());
 
   const handleChangeQuizName = React.useCallback(
@@ -30,6 +31,10 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
     [store],
   );
 
+  const handleSaveClick = React.useCallback(() => {
+    if (onSaveClick) onSaveClick({ name: store.name, items: store.items });
+  }, [onSaveClick, store.items, store.name]);
+
   return (
     <div className={style.main}>
       <div className={style.quizName}>
@@ -39,7 +44,7 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
           value={store.name}
           onChange={handleChangeQuizName}
         />
-        <Button className={style.quizButton} onClick={onSaveClick}>
+        <Button className={style.quizButton} onClick={handleSaveClick}>
           Сохранить
         </Button>
       </div>
@@ -57,13 +62,14 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
                   onClick={store.handleItemClick}
                 />
               ))}
-              <AddButton onClick={store.handleAddClick} disabled={false} />
+              <AddButton onClick={store.handleAddClick} disabled={disabled} />
             </Scrollbars>
           </div>
         </div>
         {store.selectedItem && (
           <div className={style.questionContainer}>
             <QuestionHead
+              disabled={disabled}
               nameValue={store.selectedItem.title}
               timeValue={store.selectedItem.time}
               onChangeName={store.handleItemChangeTitle}
@@ -81,7 +87,7 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
                         color={colors[i]}
                         selected={v.selected}
                         editable
-                        disabled={false}
+                        disabled={disabled}
                         onChange={(val) => store.handleChangeItemVariantValue(v.variant, val)}
                         onClick={() => store.handleSelectItemVariant(v.variant)}
                       />
