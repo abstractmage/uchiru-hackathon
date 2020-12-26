@@ -22,6 +22,11 @@ export type Quiz = {
   preview: string;
 };
 
+type QuizCurrentState = {
+  quizActivated: boolean,
+  currentQuestionIndex: number,
+};
+
 export class AppStore {
   loaded = false;
 
@@ -36,7 +41,7 @@ export class AppStore {
 
   quizzes: Quiz[] = [];
 
-  quizEventsManager: any;
+  quizEventsManager = new QuizEventsManager();
 
   get teacherAppData() {
     return this.quizzes.map((quiz) => ({
@@ -102,6 +107,24 @@ export class AppStore {
     };
   }
 
+  getQuizData = async (pin: number): Promise<Quiz> => {
+    const [ result ] = await Promise.all([Axios.get(`http://localhost:3001/quiz/${pin}`), wait(500)]);
+    return result.data.quiz;
+  }
+
+  getQuizCurrentState(): QuizCurrentState {
+    return {
+      quizActivated: this.quizEventsManager.quizActivated,
+      currentQuestionIndex: this.quizEventsManager.currentQuestionIndex,
+    }
+  }
+
+  getQuizRating(): any {
+    return {
+      quizRating: this.quizEventsManager.quizRating,
+    }
+  }
+
   setPage(page: string) {
     this.page = page;
   }
@@ -158,10 +181,19 @@ export class AppStore {
   };
 
   handleQuizzesStartClick = (pin: number) => {
-    this.quizEventsManager = new QuizEventsManager('teacher');
+    this.quizEventsManager.init('teacher');
     this.quizEventsManager.launchQuiz(pin);
     this.setPage(`/teacher/control/${pin}`);
   };
+
+  handleJoinQuiz = (nickName: string, pin: number) => {
+    this.quizEventsManager.init(nickName);
+    this.quizEventsManager.joinQuiz(nickName, pin);
+  }
+
+  handleSelectAnswer = (pin: number, quiestionId: number, selectedAnswer: number ) => {
+    this.quizEventsManager.selectAnswer(pin, quiestionId, selectedAnswer);
+  }
 
   handleQuizSave = ({
     id,
@@ -218,6 +250,8 @@ export class AppStore {
       this.setPage('/teacher/quizzes');
     });
   };
+
+
 }
 
 // axios.get('http://localhost:3001/teacher').then((res) => {
