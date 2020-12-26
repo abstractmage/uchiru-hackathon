@@ -48,12 +48,11 @@ export const App = observer(function App() {
           </Route>
           <Route path="/teacher/quizzes/:id" exact>
             {({ match }) => {
-              const id = match?.params.id;
+              const pin = Number(match?.params.id);
 
-              if (id === null || id === undefined) return null;
-
-              const quiz = store.quizzes.find((q) => q._id === id)!;
-              const items = store.getQuizCreatingPageItems(id)!;
+              if (pin === null || pin === undefined) return null;
+              const quiz = store.quizzes.find((q) => q.pin === pin)!;
+              const items = store.getQuizCreatingPageItems(pin)!;
 
               return (
                 <QuizCreatingPage
@@ -66,11 +65,11 @@ export const App = observer(function App() {
           </Route>
           <Route path="/teacher/play/:pin" exact>
             {({ match }) => {
-              const pin = match?.params.pin;
+              const pin = Number(match?.params.pin);
 
               if (pin === null || pin === undefined) return null;
 
-              return <QuizControlPage quiz={store.getQuizControlPageData(+pin)!} />;
+              return <QuizControlPage quiz={store.getQuizControlPageData(pin)!} />;
             }}
           </Route>
           <Route path="/student" exact>
