@@ -1,5 +1,7 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-case-declarations */
+/* eslint-disable no-fallthrough */
 export default class QuizEventsManager {
-
   constructor(client, clientType, userName = '') {
     this.client = client;
     this.clientType = clientType;
@@ -12,9 +14,9 @@ export default class QuizEventsManager {
 
   init() {
     this.client.onopen = () => {
-      console.log("Соединение установлено.");
+      console.log('Соединение установлено.');
     };
-    this.client.onmessage= (message) => {
+    this.client.onmessage = (message) => {
       console.log('message', message.data);
       const messageObject = this.getMessage(message.data);
       if (this.clientType === 'teacher') {
@@ -28,14 +30,14 @@ export default class QuizEventsManager {
 
   handleTeacherEvents(messageObject) {
     const { eventName } = messageObject;
-    switch(eventName) {
+    switch (eventName) {
       case 'pupil-joined-quiz':
         this.quizActivated = true;
-        // по этому флагу активируется кнопка Начать у учителя
+      // по этому флагу активируется кнопка Начать у учителя
       case 'update-pupils-data':
         const { pupilsData } = messageObject;
         this.pupilsData = pupilsData;
-        // по pupilsData надо будет обновлять рейтинг
+      // по pupilsData надо будет обновлять рейтинг
       default:
         break;
     }
@@ -43,45 +45,51 @@ export default class QuizEventsManager {
 
   handlePupilEvents(messageObject) {
     const { eventName } = messageObject;
-    switch(eventName) {
+    switch (eventName) {
       case 'show-question':
         const { questionId } = messageObject;
         this.currentQuestionIndex = Number(questionId);
-        // по currentQuestion обновляется инфа на странице ученика
+      // по currentQuestion обновляется инфа на странице ученика
       case 'joined-to-quiz':
         this.quizData = messageObject.quizData;
-        // quizData должен быть сохранен где-то у ученика
+      // quizData должен быть сохранен где-то у ученика
       default:
         break;
     }
   }
 
   launchQuiz(quizId) {
-    this.client.send(this.convertMessage({
-      userName: 'teacher',
-      eventName: 'launch-quiz',
-      quizId: quizId,
-    }));
+    this.client.send(
+      this.convertMessage({
+        userName: 'teacher',
+        eventName: 'launch-quiz',
+        quizId,
+      }),
+    );
   }
 
   showQuestion(nextQuestionId) {
     // срабатывает по переключению задания
-    this.client.send(this.convertMessage({
-      userName: 'teacher',
-      eventName: 'show-question',
-      questionId: nextQuestionId,
-    }));
+    this.client.send(
+      this.convertMessage({
+        userName: 'teacher',
+        eventName: 'show-question',
+        questionId: nextQuestionId,
+      }),
+    );
   }
 
   selectAnswer(quizId, questionId, answerId) {
     // срабатывает при выборе ответа учеником
-    this.client.send(this.convertMessage({
-      eventName: 'select-answer',
-      userName: `${this.clientType}-${this.userName}`,
-      questionId: questionId,
-      answerId: answerId,
-      quizId: quizId,
-    }));
+    this.client.send(
+      this.convertMessage({
+        eventName: 'select-answer',
+        userName: `${this.clientType}-${this.userName}`,
+        questionId,
+        answerId,
+        quizId,
+      }),
+    );
   }
 
   convertMessage(messageObject) {
@@ -91,4 +99,4 @@ export default class QuizEventsManager {
   getMessage(message) {
     return JSON.parse(message);
   }
-};
+}

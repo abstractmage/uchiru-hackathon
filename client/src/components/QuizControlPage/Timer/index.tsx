@@ -12,23 +12,17 @@ const useTimer = ({ run, onEnd }: { run: boolean; onEnd: () => void }) => {
 
   React.useEffect(() => {
     if (run) {
-      const interval = setInterval(
-        () =>
-          setSecond((v) => {
-            if (v === 0) {
-              onEnd();
-              clearInterval(interval);
-              return 0;
-            }
-
-            return v - 1;
-          }),
-        1000,
-      );
+      const interval = setInterval(() => setSecond((v) => v - 1), 1000);
 
       return () => clearInterval(interval);
     }
   }, [onEnd, run]);
+
+  React.useEffect(() => {
+    if (second === -1) {
+      onEnd();
+    }
+  }, [onEnd, second]);
 
   return second;
 };

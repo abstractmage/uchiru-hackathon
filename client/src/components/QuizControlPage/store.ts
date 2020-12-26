@@ -24,12 +24,16 @@ export class QuizControlPageStore {
 
   players: Player[] = [];
 
-  currentQuestion = 0;
+  currentQuestion: number | null = null;
 
   quiz: Quiz | null = null;
 
   constructor() {
     makeAutoObservable(this);
+  }
+
+  setState(value: 'waiting' | 'countdown' | 'progress' | 'final') {
+    this.state = value;
   }
 
   initQuiz = (quiz: Quiz) => {
