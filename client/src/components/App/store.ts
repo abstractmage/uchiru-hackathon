@@ -10,6 +10,7 @@ export type Question = {
   rightAnswer: number;
   timeLimit: number;
   title: string;
+  image: string,
 };
 
 export type Quiz = {
@@ -17,6 +18,7 @@ export type Quiz = {
   pin: number;
   title: string;
   questions: Question[];
+  preview: string,
 };
 
 export class AppStore {
@@ -38,7 +40,7 @@ export class AppStore {
       // eslint-disable-next-line no-underscore-dangle
       id: quiz._id,
       pin: quiz.pin,
-      preview: undefined,
+      preview: quiz.preview,
       title: quiz.title,
       taskCount: quiz.questions.length,
     }));
@@ -48,8 +50,8 @@ export class AppStore {
     makeAutoObservable(this);
   }
 
-  getQuizCreatingPageItems(id: string) {
-    const quiz = this.quizzes.find((q) => q._id === id);
+  getQuizCreatingPageItems(pin: number) {
+    const quiz = this.quizzes.find((q) => q.pin === pin);
 
     if (!quiz) return null;
 
@@ -57,7 +59,7 @@ export class AppStore {
       index,
       title: question.title,
       time: `${question.timeLimit}`,
-      preview: undefined,
+      image: question.image,
       variants: question.answers.map((a, i) => ({
         variant: `${i + 1}`,
         value: a,
@@ -186,8 +188,8 @@ export class AppStore {
     }));
 
     Promise.all([
-      Axios.post(`http://localhost:3001/teacher/edit/${pin}`, {
-        pin,
+      Axios.post(`http://localhost:3001/teacher/edit/${pin}`,
+      { pin,
         updated: {
           title: name,
           preview: items[0].preview || '',
@@ -199,7 +201,7 @@ export class AppStore {
             timeLimit: +item.time,
           })),
         },
-      }),
+      }, { headers: { 'Access-Control-Allow-Origin' : '*' }},),
       wait(1000),
     ]).then(() => {
       this.setPreloader(false, false);
