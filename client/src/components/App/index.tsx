@@ -8,6 +8,7 @@ import { AppStore } from './store';
 import { Preloader } from '../Preloader';
 import { QuizzesPage } from '../QuizzesPage';
 import { QuizCreatingPage } from '../QuizCreatingPage';
+// import { QuizPlayPage } from '../QuizPlayPage';
 import { QuizControlPageStore } from '../QuizControlPage/store';
 import { QuizControlPage } from '../QuizControlPage';
 
@@ -72,8 +73,14 @@ export const App = observer(function App() {
               return <QuizControlPage quiz={store.getQuizControlPageData(pin)!} />;
             }}
           </Route>
-          <Route path="/student" exact>
-            <div>Student Page</div>
+          <Route path="/pupil" exact>
+            {/* <QuizPlayPage
+              onSelectAnswerClick={store.handleSelectAnswer}
+              onJoinQuizClick={store.handleJoinQuiz}
+              getQuizData={store.getQuizData}
+              getQuizCurrentState={store.getQuizCurrentState}
+            /> */}
+            <div>Pupil</div>
           </Route>
           <Route>Error</Route>
         </Switch>
