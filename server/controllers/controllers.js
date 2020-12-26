@@ -4,6 +4,8 @@ const controllers = (collection) => {
 
   const addQuiz = async (req, res, next) => {
     try {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "X-Requested-With");
       const { body } = req;
       if (body) {
         const newQuiz = new Quiz(body);
@@ -47,9 +49,12 @@ const controllers = (collection) => {
 
   const updateQuiz = async (req, res, next) => {
     try {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "X-Requested-With");
       const { quizId } = req.params;
       const { updated } = req.body;
       const filter = { pin: Number(quizId) };
+      console.log('updated', updated);
       const updateDoc = {
         $set: updated
       };
