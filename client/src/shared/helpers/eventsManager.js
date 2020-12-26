@@ -2,17 +2,19 @@
 /* eslint-disable no-case-declarations */
 /* eslint-disable no-fallthrough */
 export default class QuizEventsManager {
-  constructor(client, clientType, userName = '') {
-    this.client = client;
-    this.clientType = clientType;
+  constructor() {
+    this.client = null;
+    this.clientType = '';
     this.currentQuestionIndex = -1;
     this.quizData = null;
     this.quizActivated = false;
-    this.userName = userName;
-    this.init();
+    this.userName = '';
+    this.quizRating = {};
   }
 
-  init() {
+  init(clientType) {
+    this.clientType = clientType;
+    this.client = new WebSocket('ws://localhost:3001');
     this.client.onopen = () => {
       console.log('Соединение установлено.');
     };
@@ -35,8 +37,8 @@ export default class QuizEventsManager {
         this.quizActivated = true;
       // по этому флагу активируется кнопка Начать у учителя
       case 'update-pupils-data':
-        const { pupilsData } = messageObject;
-        this.pupilsData = pupilsData;
+        const { quizRating } = messageObject;
+        this.quizRating = quizRating;
       // по pupilsData надо будет обновлять рейтинг
       default:
         break;
@@ -47,6 +49,7 @@ export default class QuizEventsManager {
     const { eventName } = messageObject;
     switch (eventName) {
       case 'show-question':
+        this.quizActivated = true;
         const { questionId } = messageObject;
         this.currentQuestionIndex = Number(questionId);
       // по currentQuestion обновляется инфа на странице ученика
@@ -59,13 +62,19 @@ export default class QuizEventsManager {
   }
 
   launchQuiz(quizId) {
-    this.client.send(
-      this.convertMessage({
-        userName: 'teacher',
-        eventName: 'launch-quiz',
-        quizId,
-      }),
-    );
+    if (this.client.readyState) {
+      this.client.send(
+        this.convertMessage({
+          userName: 'teacher',
+          eventName: 'launch-quiz',
+          quizId,
+        }),
+      );
+    } else {
+      setTimeout(() => {
+        this.launchQuiz(quizId);
+      }, 100);
+    }
   }
 
   showQuestion(nextQuestionId) {
@@ -90,6 +99,23 @@ export default class QuizEventsManager {
         quizId,
       }),
     );
+  }
+
+  joinQuiz(userName, quizId) {
+    this.userName = userName;
+    if (this.client.readyState) {
+      this.client.send(
+        this.convertMessage({
+          userName,
+          eventName: 'join-quiz',
+          quizId,
+        }),
+      );
+    } else {
+      setTimeout(() => {
+        this.launchQuiz(quizId);
+      }, 100);
+    }
   }
 
   convertMessage(messageObject) {

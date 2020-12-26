@@ -5,7 +5,7 @@ class QuizRoom {
     this.pupils = {};
     this.teacher = null;
     this.dataCollection = dataCollection;
-    this.pupilsData = {};
+    this.quizRating = {};
     this.activeQuizess = {};
   }
 
@@ -47,31 +47,32 @@ class QuizRoom {
 
   async handlePupilsEvents(messageObject) {
     console.log('handlePupilsEvents');
-    const { eventName, userName, quizId } = messageObject;
+    const { eventName, quizId } = messageObject;
     switch (eventName) {
       case 'pupil-join':
-        if (!this.activeQuizess[quizId]) {
-          this.pupils[userName].send(this.convertMessage({ error: 'Подключение к неактивной викторине' }));
-          break;
-        }
-        const quizData = await this.dataCollection.findOne({ pin: Number(quizId) });
-        if (!quizData) {
-          this.pupils[userName].send(this.convertMessage({ error: 'Подключение к несуществующей викторине' }));
-        } else {
-          this.pupils[userName].send(this.convertMessage({ eventName: 'wait-for-quiz-activation', quizData: quizData }));
-        }
+        // if (!this.activeQuizess[quizId]) {
+        //   this.pupils[messageObject.userName].send(this.convertMessage({ error: 'Подключение к неактивной викторине' }));
+        //   break;
+        // }
+        // const quizData = await this.dataCollection.findOne({ pin: Number(quizId) });
+        // if (!quizData) {
+        //   this.pupils[messageObject.userName].send(this.convertMessage({ error: 'Подключение к несуществующей викторине' }));
+        // } else {
+        //   this.pupils[messageObject.userName].send(this.convertMessage({ eventName: 'wait-for-quiz-activation', quizData: quizData }));
+        // }
+        // this.pupils[messageObject.userName].send(this.convertMessage({ eventName: 'wait-for-quiz-activation', quizData: quizData }));
         this.teacher.send(this.convertMessage({
           eventName: 'pupil-joined-quiz'
         }));
       case 'select-answer':
-        const { userName, questionId, answerId } = messageObject;
-        if (!this.pupilsData[userName] ) {
-          this.pupilsData[userName] = {};
+        const { questionId, answerId } = messageObject;
+        if (!this.quizRating[messageObject.userName] ) {
+          this.quizRating[messageObject.userName] = {};
         }
-        this.pupilsData[userName][questionId] = answerId;
+        this.quizRating[messageObject.userName][questionId] = answerId;
         this.teacher.send(this.convertMessage({
           eventName: 'update-pupils-data',
-          pupilsData: this.pupilsData,
+          quizRating: this.quizRating,
         }))
         break;
       default:
