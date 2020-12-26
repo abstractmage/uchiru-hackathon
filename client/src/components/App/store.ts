@@ -10,7 +10,7 @@ export type Question = {
   rightAnswer: number;
   timeLimit: number;
   title: string;
-  image: string,
+  image: string;
 };
 
 export type Quiz = {
@@ -18,7 +18,7 @@ export type Quiz = {
   pin: number;
   title: string;
   questions: Question[];
-  preview: string,
+  preview: string;
 };
 
 export class AppStore {
@@ -188,20 +188,24 @@ export class AppStore {
     }));
 
     Promise.all([
-      Axios.post(`http://localhost:3001/teacher/edit/${pin}`,
-      { pin,
-        updated: {
-          title: name,
-          preview: items[0].preview || '',
-          questions: items.map((item) => ({
-            title: item.title,
-            image: item.preview || '',
-            answers: item.variants.map((v) => v.value),
-            rightAnswer: item.variants.findIndex((v) => v.selected),
-            timeLimit: +item.time,
-          })),
+      Axios.post(
+        `http://localhost:3001/teacher/edit/${pin}`,
+        {
+          pin,
+          updated: {
+            title: name,
+            preview: items[0].image || '',
+            questions: items.map((item) => ({
+              title: item.title,
+              image: item.image || '',
+              answers: item.variants.map((v) => v.value),
+              rightAnswer: item.variants.findIndex((v) => v.selected),
+              timeLimit: +item.time,
+            })),
+          },
         },
-      }, { headers: { 'Access-Control-Allow-Origin' : '*' }},),
+        { headers: { 'Access-Control-Allow-Origin': '*' } },
+      ),
       wait(1000),
     ]).then(() => {
       this.setPreloader(false, false);

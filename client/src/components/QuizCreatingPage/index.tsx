@@ -68,7 +68,7 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
                   key={item.index}
                   index={item.index}
                   title={item.title}
-                  preview={item.preview}
+                  preview={item.image}
                   selected={item.index === store.selected}
                   onClick={store.handleItemClick}
                 />
@@ -87,7 +87,7 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
               onChangeTime={store.handleItemChangeTime}
             />
             <Preview
-              file={store.selectedItem.preview}
+              file={store.selectedItem.image}
               onSelectFile={(result) => store.handleSelectPreview(result && result.base64)}
             />
             <div className={style.selectButtonsWrap}>

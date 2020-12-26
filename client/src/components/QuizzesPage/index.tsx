@@ -23,7 +23,7 @@ export type QuizzesPageProps = {
 export const QuizzesPage: React.FC<QuizzesPageProps> = (props) => {
   const { locked, quizzes, onChangeClick, onCreateClick, onStartClick } = props;
 
-  const client = new WebSocket("ws://localhost:3001");
+  const client = new WebSocket('ws://localhost:3001');
   const quizEventsManager = new QuizEventsManager(client, 'teacher');
 
   const createStartClickHandler = React.useCallback(
@@ -33,6 +33,7 @@ export const QuizzesPage: React.FC<QuizzesPageProps> = (props) => {
         quizEventsManager.launchQuiz(pin);
       };
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onStartClick],
   );
 

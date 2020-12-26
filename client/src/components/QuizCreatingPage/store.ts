@@ -10,7 +10,7 @@ export type Item = {
   index: number;
   title: string;
   time: string;
-  preview?: string;
+  image?: string;
   variants: Variant[];
 };
 
@@ -22,7 +22,7 @@ export class QuizCreatingPageStore {
       index: 0,
       title: '',
       time: '20',
-      preview: undefined,
+      image: undefined,
       variants: [
         {
           variant: '1',
@@ -143,7 +143,7 @@ export class QuizCreatingPageStore {
 
   handleSelectPreview = (file: string | null) => {
     if (this.selectedItem) {
-      this.selectedItem.preview = file || undefined;
+      this.selectedItem.image = file || undefined;
     }
   };
 }
