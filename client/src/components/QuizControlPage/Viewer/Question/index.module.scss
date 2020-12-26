@@ -1,0 +1,155 @@
+.main {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  padding: 125px 0 115px;
+
+  &_exiting {
+    transition: transform 500ms;
+    transform: translate(-150%);
+  }
+
+  &_exited {
+    transform: translate(150%);
+  }
+
+  &_entering {
+    transition: transform 500ms;
+    transform: translate(0%);
+  }
+
+  &_entered {
+    transform: translate(0%);
+  }
+}
+
+.inner {
+  width: 100%;
+  height: 810px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.number {
+  position: absolute;
+  left: 0;
+  top: -64px;
+  width: 100%;
+  font-weight: bold;
+  font-size: 64px;
+  line-height: 48px;
+  color: #FFFFFF;
+  transform: translateY(-100%);
+  text-align: center;
+  opacity: 1;
+
+  &_hidden {
+    transition: opacity 500ms;
+    opacity: 0;
+  }
+}
+
+.title {
+  position: relative;
+  width: 100%;
+  background: #FFFFFF;
+  color: rgba(9, 21, 38, 0.85);
+  font-weight: bold;
+  font-size: 40px;
+  line-height: 48px;
+  text-align: center;
+
+  &_shown {
+    transition: background 500ms, color 500ms;
+    background: transparent;
+    color: #fff;
+  }
+}
+
+.titleInner {
+  width: 1160px;
+  height: 100%;
+  margin: auto;
+}
+
+.media {
+  width: 100%;
+  height: 190px;
+  margin: 24px 0;
+
+  &_opened {
+    transition: height 500ms;
+    height: 360px;
+  }
+}
+
+.mediaInner {
+  position: relative;
+  width: 640px;
+  height: 100%;
+  margin: auto;
+}
+
+.image,
+.stats {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 500ms;
+
+  &_shown {
+    opacity: 1;
+  }
+}
+
+.image {
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+}
+
+.variants {
+  width: 100%;
+  height: 184px;
+  transform: translateY(100%);
+  opacity: 0;
+  display: flex;
+
+  &_shown {
+    transition: opacity 500ms, transform 500ms;
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.variantsInner {
+  display: flex;
+  flex-wrap: wrap;
+  width: 1136px;
+  height: 100%;
+  justify-content: space-around;
+  align-content: space-around;
+  pointer-events: none;
+  margin: auto;
+}
+
+.variant {
+  width: 556px;
+  transition: opacity 400ms;
+
+  &_wrong {
+    opacity: 0.3;
+  }
+}

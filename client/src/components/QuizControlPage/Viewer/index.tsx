@@ -1,69 +1,50 @@
+/* eslint-disable consistent-return */
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
-import { Transition } from 'react-transition-group';
 import cn from 'classnames';
-import { Question } from '../store';
+import { Question as QuestionType } from '../store';
 import style from './index.module.scss';
-import { SelectButton } from '~/components/SelectButton';
+import { Question } from './Question';
+import { ReactComponent as ButtonSVG } from './svg/Button.svg';
 
 export type ViewerProps = {
   current: number | null;
-  questions: Question[];
+  questions: QuestionType[];
+  onButtonClick?: () => void;
   onQuestionShown: ((index: number) => void) | null;
+  onQuestionHidden: ((index: number) => void) | null;
   result: {
     stats: number[];
     right: number;
   } | null;
 };
 
-const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'orange', 'purple'];
-
 export const Viewer: React.FC<ViewerProps> = function Viewer(props) {
-  const { current, questions, onQuestionShown, result } = props;
-  const currentQuestionRef = React.useRef<HTMLDivElement>(null);
+  const { current, questions, onQuestionShown, onButtonClick, result } = props;
+
+  const handleQuestionShown = React.useCallback(() => console.log('question shown'), []);
+  const handleQuestionHidden = React.useCallback(() => console.log('question hidden'), []);
 
   return (
     <div className={style.main}>
       {questions.map((q, i) => (
-        <Transition
-          nodeRef={currentQuestionRef}
+        <Question
           key={i}
-          in={current === q.index}
-          onEnter={() => currentQuestionRef.current?.offsetHeight}
-          timeout={500}
-          mountOnEnter
-          unmountOnExit
-        >
-          {(state) => (
-            <div
-              ref={currentQuestionRef}
-              className={cn(style.question, style[`question_${state}`])}
-            >
-              {/* <div className={style.number}>{`Вопрос ${q.index + 1}`}</div> */}
-              <div className={style.text}>{q.text}</div>
-            </div>
-          )}
-        </Transition>
+          shown={current === i}
+          onShowingEnd={handleQuestionShown}
+          onHidingEnd={handleQuestionHidden}
+          number={i + 1}
+          text={q.text}
+          image={q.preview}
+          answers={q.answers}
+          result={result}
+        />
       ))}
-
-      {/* <div className={cn(style.question)}>
-        <div className={style.number}>{`Вопрос ${questions[current].index}`}</div>
-        <div className={style.text}>{questions[current].text}</div>
-        <Transition in={!!stats} timeout={2000}>
-          {(state) =>
-            stats!.map((s) => (
-              <div className={style.stats}>
-                <div className={style.statsItem} />
-              </div>
-            ))
-          }
-        </Transition>
-        {questions[current].answers.map((answer, i) => (
-          <div className={style.variant}>
-            <SelectButton variant={`${i + 1}`} value={answer} color={colors[i]} />
-          </div>
-        ))}
-      </div> */}
+      <div className={style.buttonContainer}>
+        <div className={cn(style.button, result && style.button_shown)}>
+          <ButtonSVG />
+        </div>
+      </div>
     </div>
   );
 };

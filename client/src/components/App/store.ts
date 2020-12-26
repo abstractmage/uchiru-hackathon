@@ -101,7 +101,7 @@ export class AppStore {
         index: i,
         id: q._id,
         text: q.title,
-        preview: undefined,
+        preview: q.image || undefined,
         answers: q.answers,
       })),
     };

@@ -40,8 +40,9 @@ export const QuizControlPage: React.FC<QuizControlPageProps> = observer(function
         <Viewer
           current={store.currentQuestion}
           questions={store.quiz.questions}
-          onQuestionShown={null}
-          result={null}
+          onQuestionShown={(index) => console.log(index)}
+          onQuestionHidden={null}
+          result={store.currentQuestionResult}
         />
       </div>
     )

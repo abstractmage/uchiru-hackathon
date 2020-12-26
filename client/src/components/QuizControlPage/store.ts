@@ -26,6 +26,8 @@ export class QuizControlPageStore {
 
   currentQuestion: number | null = null;
 
+  currentQuestionResult: { stats: number[]; right: number } | null = null;
+
   quiz: Quiz | null = null;
 
   constructor() {
