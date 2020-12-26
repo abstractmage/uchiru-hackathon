@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import Axios from 'axios';
 import { wait } from '~/shared/helpers/wait';
 import { Item } from '../QuizCreatingPage/store';
+import QuizEventsManager from '../../shared/helpers/eventsManager';
 
 export type Question = {
   _id: string;
@@ -34,6 +35,8 @@ export class AppStore {
   page = window.location.pathname;
 
   quizzes: Quiz[] = [];
+
+  quizEventsManager: any;
 
   get teacherAppData() {
     return this.quizzes.map((quiz) => ({
@@ -155,6 +158,8 @@ export class AppStore {
   };
 
   handleQuizzesStartClick = (pin: number) => {
+    this.quizEventsManager = new QuizEventsManager('teacher');
+    this.quizEventsManager.launchQuiz(pin);
     this.setPage(`/teacher/control/${pin}`);
   };
 

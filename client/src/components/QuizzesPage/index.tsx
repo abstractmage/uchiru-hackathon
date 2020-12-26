@@ -2,7 +2,6 @@ import React from 'react';
 import { QuizCard } from './QuizCard';
 import { CreateButton } from './CreateButton';
 import style from './index.module.scss';
-import QuizEventsManager from '../../shared/helpers/eventsManager';
 
 export type Quiz = {
   id: string;
@@ -23,15 +22,9 @@ export type QuizzesPageProps = {
 export const QuizzesPage: React.FC<QuizzesPageProps> = (props) => {
   const { locked, quizzes, onChangeClick, onCreateClick, onStartClick } = props;
 
-  const client = new WebSocket('ws://localhost:3001');
-  const quizEventsManager = new QuizEventsManager(client, 'teacher');
-
   const createStartClickHandler = React.useCallback(
     (pin: number) => {
-      return () => {
-        onStartClick(pin);
-        quizEventsManager.launchQuiz(pin);
-      };
+      return () => onStartClick(pin);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [onStartClick],
