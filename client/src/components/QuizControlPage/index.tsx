@@ -4,6 +4,7 @@ import style from './index.module.scss';
 import { Quiz, QuizControlPageStore } from './store';
 import { Timer } from './Timer';
 import { Viewer } from './Viewer';
+import { Results } from './Viewer/Results';
 import { WaitRoom } from './WaitRoom';
 
 export type QuizControlPageProps = {
@@ -39,11 +40,15 @@ export const QuizControlPage: React.FC<QuizControlPageProps> = observer(function
         <Timer run={store.state === 'countdown'} onEnd={store.handleCountDownEnd} />
         <Viewer
           current={store.currentQuestion}
+          questionShown={store.questionShown}
           questions={store.quiz.questions}
-          onQuestionShown={(index) => console.log(index)}
-          onQuestionHidden={null}
+          onQuestionShown={store.handleQuestionShown}
+          onQuestionHidden={store.handleQuestionHidden}
+          onTimerEnd={store.handleTimerEnd}
+          onButtonClick={store.handleButtonClick}
           result={store.currentQuestionResult}
         />
+        {store.state === 'results' && <Results />}
       </div>
     )
   );

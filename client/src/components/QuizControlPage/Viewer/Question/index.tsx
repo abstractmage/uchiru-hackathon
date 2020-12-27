@@ -8,6 +8,7 @@ import { SelectButton } from '~/components/SelectButton';
 import style from './index.module.scss';
 import { Stats } from '../Stats';
 import { QuestionStore } from './store';
+import { Timer } from '../Timer';
 
 export type QuestionProps = {
   shown?: boolean;
@@ -18,17 +19,30 @@ export type QuestionProps = {
   image?: string;
   answers: string[];
   result: { stats: number[]; right: number } | null;
+  timer: number;
+  onTimerEnd?: () => void;
 };
 
 const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'orange', 'purple'];
 
 export const Question: React.FC<QuestionProps> = observer(function Question(props) {
-  const { shown, onShowingEnd, onHidingEnd, number, text, image, answers, result } = props;
+  const {
+    shown,
+    onShowingEnd,
+    onHidingEnd,
+    number,
+    text,
+    image,
+    answers,
+    result,
+    timer,
+    onTimerEnd,
+  } = props;
   const store = useLocalObservable(() => new QuestionStore());
   const {
     translated: [translated],
     numberShown: [numberShown],
-    titleShown: [titleShown],
+    titleShown: [titleShown, titleShowing],
     mediaOpened: [mediaOpened],
     imageShown: [imageShown],
     statsShown: [statsShown],
@@ -45,7 +59,6 @@ export const Question: React.FC<QuestionProps> = observer(function Question(prop
   const mounted = React.useRef(false);
 
   React.useEffect(() => {
-    console.log(store);
     return store.cancel;
   }, [store]);
 
@@ -115,6 +128,14 @@ export const Question: React.FC<QuestionProps> = observer(function Question(prop
   const handleStatsCalculatingEnd = React.useCallback(() => {
     store.handleStateChangingEnd('statsCalculated');
   }, [store]);
+
+  const handleTimerShowingEnd = React.useCallback(() => {
+    console.log('timer shown');
+  }, []);
+
+  const handleTimerEnd = React.useCallback(() => {
+    if (onTimerEnd) onTimerEnd();
+  }, [onTimerEnd]);
 
   React.useEffect(() => {
     if (mounted.current === false) {
@@ -212,6 +233,12 @@ export const Question: React.FC<QuestionProps> = observer(function Question(prop
               </div>
             </div>
           </div>
+          <Timer
+            shown={titleShown && !result}
+            onShowingEnd={handleTimerShowingEnd}
+            value={titleShown && !titleShowing ? timer : null}
+            onTimerEnd={handleTimerEnd}
+          />
         </div>
       )}
     </Transition>

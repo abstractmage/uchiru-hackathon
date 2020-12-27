@@ -9,10 +9,12 @@ import { ReactComponent as ButtonSVG } from './svg/Button.svg';
 
 export type ViewerProps = {
   current: number | null;
+  questionShown: boolean;
   questions: QuestionType[];
-  onButtonClick?: () => void;
-  onQuestionShown: ((index: number) => void) | null;
-  onQuestionHidden: ((index: number) => void) | null;
+  onButtonClick: () => void;
+  onQuestionShown: () => void;
+  onQuestionHidden: () => void;
+  onTimerEnd: () => void;
   result: {
     stats: number[];
     right: number;
@@ -20,28 +22,36 @@ export type ViewerProps = {
 };
 
 export const Viewer: React.FC<ViewerProps> = function Viewer(props) {
-  const { current, questions, onQuestionShown, onButtonClick, result } = props;
-
-  const handleQuestionShown = React.useCallback(() => console.log('question shown'), []);
-  const handleQuestionHidden = React.useCallback(() => console.log('question hidden'), []);
+  const {
+    current,
+    questionShown,
+    questions,
+    onButtonClick,
+    onQuestionHidden,
+    onQuestionShown,
+    onTimerEnd,
+    result,
+  } = props;
 
   return (
     <div className={style.main}>
       {questions.map((q, i) => (
         <Question
           key={i}
-          shown={current === i}
-          onShowingEnd={handleQuestionShown}
-          onHidingEnd={handleQuestionHidden}
+          shown={questionShown && current === i}
+          onShowingEnd={onQuestionShown}
+          onHidingEnd={onQuestionHidden}
+          onTimerEnd={onTimerEnd}
           number={i + 1}
           text={q.text}
           image={q.preview}
           answers={q.answers}
           result={result}
+          timer={q.timer}
         />
       ))}
       <div className={style.buttonContainer}>
-        <div className={cn(style.button, result && style.button_shown)}>
+        <div className={cn(style.button, result && style.button_shown)} onClick={onButtonClick}>
           <ButtonSVG />
         </div>
       </div>

@@ -23,8 +23,8 @@ export type Quiz = {
 };
 
 type QuizCurrentState = {
-  quizActivated: boolean,
-  currentQuestionIndex: number,
+  quizActivated: boolean;
+  currentQuestionIndex: number;
 };
 
 export class AppStore {
@@ -100,6 +100,7 @@ export class AppStore {
       questions: quiz.questions.map((q, i) => ({
         index: i,
         id: q._id,
+        timer: q.timeLimit,
         text: q.title,
         preview: q.image || undefined,
         answers: q.answers,
@@ -108,21 +109,21 @@ export class AppStore {
   }
 
   getQuizData = async (pin: number): Promise<Quiz> => {
-    const [ result ] = await Promise.all([Axios.get(`http://localhost:3001/quiz/${pin}`), wait(500)]);
+    const [result] = await Promise.all([Axios.get(`http://localhost:3001/quiz/${pin}`), wait(500)]);
     return result.data.quiz;
-  }
+  };
 
   getQuizCurrentState(): QuizCurrentState {
     return {
       quizActivated: this.quizEventsManager.quizActivated,
       currentQuestionIndex: this.quizEventsManager.currentQuestionIndex,
-    }
+    };
   }
 
   getQuizRating(): any {
     return {
       quizRating: this.quizEventsManager.quizRating,
-    }
+    };
   }
 
   setPage(page: string) {
@@ -189,11 +190,11 @@ export class AppStore {
   handleJoinQuiz = (nickName: string, pin: number) => {
     this.quizEventsManager.init(nickName);
     this.quizEventsManager.joinQuiz(nickName, pin);
-  }
+  };
 
-  handleSelectAnswer = (pin: number, quiestionId: number, selectedAnswer: number ) => {
+  handleSelectAnswer = (pin: number, quiestionId: number, selectedAnswer: number) => {
     this.quizEventsManager.selectAnswer(pin, quiestionId, selectedAnswer);
-  }
+  };
 
   handleQuizSave = ({
     id,
@@ -250,8 +251,6 @@ export class AppStore {
       this.setPage('/teacher/quizzes');
     });
   };
-
-
 }
 
 // axios.get('http://localhost:3001/teacher').then((res) => {
