@@ -130,11 +130,13 @@ export class AppStore {
     this.setPreloader(false, true);
   }
 
-  fetchData() {
-    Promise.all([Axios.get('http://localhost:3001/teacher'), wait(500)]).then(([{ data }]) => {
-      const { quizess } = data;
-      this.setLoadedData(quizess);
-    });
+  async fetchData() {
+    await Promise.all([Axios.get('http://localhost:3001/teacher'), wait(500)]).then(
+      ([{ data }]) => {
+        const { quizess } = data;
+        this.setLoadedData(quizess);
+      },
+    );
   }
 
   setPreloader(shown: boolean, visibility: boolean) {
