@@ -4,23 +4,7 @@ import Axios from 'axios';
 import { wait } from '~/shared/helpers/wait';
 import { Item } from '../QuizCreatingPage/store';
 import QuizEventsManager from '../../shared/helpers/eventsManager';
-
-export type Question = {
-  _id: string;
-  answers: string[];
-  rightAnswer: number;
-  timeLimit: number;
-  title: string;
-  image: string;
-};
-
-export type Quiz = {
-  _id: string;
-  pin: number;
-  title: string;
-  questions: Question[];
-  preview: string;
-};
+import { Quiz } from '~/types/Quiz';
 
 type QuizCurrentState = {
   quizActivated: boolean;

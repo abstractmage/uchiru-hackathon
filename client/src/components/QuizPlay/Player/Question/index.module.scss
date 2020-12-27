@@ -1,0 +1,139 @@
+.main {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  &_entering {
+    transition: transform 500ms;
+    transform: none;
+  }
+
+  &_entered {
+    transform: none;
+  }
+
+  &_exiting {
+    transition: transform 500ms;
+    transform: translate(-150%);
+  }
+
+  &_exited {
+    transform: translate(150%);
+  }
+}
+
+.time {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 6px;
+  background: #24C9AE;
+}
+
+.inner {
+  width: 288px;
+  height: 100%;
+  margin: auto;
+}
+
+.text {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  display: flex;
+  width: 100%;
+}
+
+.number {
+  display: flex;
+  flex-basis: 32px;
+  flex-grow: 0;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  background: #24C9AE;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 18px;
+  color: #FFFFFF;
+  margin-right: 8px;
+}
+
+.textInner {
+  margin-top: 5px;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 24px;
+  color: rgba(9, 21, 38, 0.85);
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.image {
+  width: 100%;
+  height: 152px;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center center;
+  margin-bottom: 16px;
+}
+
+.answers {
+  display: flex;
+  flex-direction: column;
+}
+
+.answer {
+  margin-bottom: 8px;
+  cursor: pointer;
+  pointer-events: none;
+  transition: opacity 200ms;
+
+  .answerMain {
+    height: 40px;
+    border-radius: 5px;
+  }
+  
+  .answerVariant {
+    font-size: 24px;
+    flex-basis: 40px;
+    width: 40px;
+  }
+
+  .answerContentInner {
+    font-size: 14px;
+    transition: background 200ms;
+  }
+
+  &_clickable {
+    pointer-events: auto;
+  }
+
+  &_blurred {
+    opacity: 0.3;
+  }
+
+  &_right {
+    .answerContentInner {
+      background: #ADFFBF;
+    }
+  }
+
+  &_wrong {
+    .answerContentInner {
+      background: #FFC5C5;
+    }
+  }
+
+  body:not(:global(.touch)) & {
+    &:hover {
+      .answerContentInner {
+        background: #F2F9FF;
+      }
+    }
+  }
+}

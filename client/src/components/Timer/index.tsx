@@ -14,7 +14,10 @@ const useTimer = ({ run, onEnd }: { run: boolean; onEnd: () => void }) => {
     if (run) {
       const interval = setInterval(() => setSecond((v) => v - 1), 1000);
 
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        setSecond(3);
+      };
     }
   }, [onEnd, run]);
 
@@ -32,7 +35,7 @@ export const Timer: React.FC<TimerProps> = (props) => {
   const second = useTimer({ run, onEnd });
 
   return run ? (
-    <div className={style.main}>
+    <div style={{ display: second < 0 ? 'none' : 'auto' }} className={style.main}>
       <div className={style.inner}>
         <div className={style.text}>Викторина начнётся через</div>
         <div className={style.second}>{second}</div>

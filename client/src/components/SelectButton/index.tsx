@@ -6,6 +6,12 @@ import { ReactComponent as EmptyRadioSVG } from './svg/EmptyRadio.svg';
 import { ReactComponent as CheckMarkSVG } from './svg/CheckMark.svg';
 
 export type SelectButtonProps = {
+  classNames?: {
+    main?: string;
+    variant?: string;
+    content?: string;
+    contentInner?: string;
+  };
   variant: string;
   value?: string;
   color?: 'green' | 'blue' | 'orange' | 'purple';
@@ -17,7 +23,17 @@ export type SelectButtonProps = {
 };
 
 export const SelectButton: React.FC<SelectButtonProps> = (props) => {
-  const { variant, value, color, selected, editable, onChange, onClick, disabled } = props;
+  const {
+    classNames,
+    variant,
+    value,
+    color,
+    selected,
+    editable,
+    onChange,
+    onClick,
+    disabled,
+  } = props;
   const ref = React.useRef<HTMLDivElement>(null);
 
   const handleChange = React.useCallback(
@@ -38,11 +54,16 @@ export const SelectButton: React.FC<SelectButtonProps> = (props) => {
 
   return (
     <div
-      className={cn(style.main, style[`main_color_${color}`], disabled && style.main_disabled)}
+      className={cn(
+        style.main,
+        style[`main_color_${color}`],
+        disabled && style.main_disabled,
+        classNames?.main,
+      )}
       onClick={handleClick}
     >
-      <div className={style.variant}>{variant}</div>
-      <div className={style.content}>
+      <div className={cn(style.variant, classNames?.variant)}>{variant}</div>
+      <div className={cn(style.content, classNames?.content)}>
         {editable ? (
           <input
             className={style.contentInner}
@@ -51,7 +72,7 @@ export const SelectButton: React.FC<SelectButtonProps> = (props) => {
             placeholder="Введите ответ"
           />
         ) : (
-          <div className={style.contentInner}>{value}</div>
+          <div className={cn(style.contentInner, classNames?.contentInner)}>{value}</div>
         )}
       </div>
       {editable && (

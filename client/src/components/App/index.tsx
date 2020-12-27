@@ -9,7 +9,7 @@ import { Preloader } from '../Preloader';
 import { QuizzesPage } from '../QuizzesPage';
 import { QuizCreatingPage } from '../QuizCreatingPage';
 // import { QuizPlayPage } from '../QuizPlayPage';
-import { QuizControlPageStore } from '../QuizControlPage/store';
+import { QuizPlayPage } from '../QuizPlay';
 import { QuizControlPage } from '../QuizControlPage';
 
 const useRouting = (page: string) => {
@@ -76,14 +76,15 @@ export const App = observer(function App() {
               return <QuizControlPage quiz={store.getQuizControlPageData(pin)!} />;
             }}
           </Route>
-          <Route path="/pupil" exact>
+          <Route path="/pupil/play" exact>
             {/* <QuizPlayPage
               onSelectAnswerClick={store.handleSelectAnswer}
               onJoinQuizClick={store.handleJoinQuiz}
               getQuizData={store.getQuizData}
               getQuizCurrentState={store.getQuizCurrentState}
-            /> */}
-            <div>Pupil</div>
+            />
+            <div>Pupil</div> */}
+            <QuizPlayPage />
           </Route>
           <Route>Error</Route>
         </Switch>

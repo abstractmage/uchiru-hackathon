@@ -2,7 +2,7 @@ import { observer, useLocalObservable } from 'mobx-react';
 import React from 'react';
 import style from './index.module.scss';
 import { Quiz, QuizControlPageStore } from './store';
-import { Timer } from './Timer';
+import { Timer } from '../Timer';
 import { Viewer } from './Viewer';
 import { Results } from './Viewer/Results';
 import { WaitRoom } from './WaitRoom';

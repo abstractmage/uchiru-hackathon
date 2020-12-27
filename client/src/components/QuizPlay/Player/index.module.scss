@@ -1,0 +1,26 @@
+.main {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+
+  &_exiting {
+    transition: opacity 500ms;
+    opacity: 0;
+  }
+
+  &_exited {
+    opacity: 0;
+  }
+
+  &_entering {
+    transition: opacity 500ms;
+    opacity: 1;
+  }
+
+  &_entered {
+    opacity: 1;
+  }
+}
