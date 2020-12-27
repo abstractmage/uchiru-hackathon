@@ -3,7 +3,7 @@ import React from 'react';
 import { Transition } from 'react-transition-group';
 import cn from 'classnames';
 import { useFunction } from '~/shared/hooks/use-function';
-import { Question as QuestionType } from '../store';
+import { Question as QuestionType } from '~/types/Question';
 import style from './index.module.scss';
 import { Question } from './Question';
 
@@ -12,15 +12,35 @@ export type PlayerProps = {
   onShowingEnd?: () => void;
   questionShown?: boolean;
   onQuestionShowingEnd?: () => void;
+  questionRunningState?: 'init' | 'running' | 'finished';
+  onQuestionRunningEnd?: (answer: number | null) => void;
   current: number;
   questions: QuestionType[];
+  questionRightAnswer?: number | null;
 };
 
 export const Player: React.FC<PlayerProps> = (props) => {
-  const { shown, onShowingEnd, questionShown, onQuestionShowingEnd, current, questions } = props;
+  const {
+    shown,
+    onShowingEnd,
+    questionShown,
+    onQuestionShowingEnd,
+    current,
+    questions,
+    questionRunningState,
+    onQuestionRunningEnd,
+    questionRightAnswer,
+  } = props;
   const ref = React.useRef<HTMLDivElement>(null);
   const handleShowingEnd = useFunction(onShowingEnd);
   const handleQuestionShowingEnd = useFunction(onQuestionShowingEnd);
+
+  const handleQuestionRunningEnd = React.useCallback(
+    (answer: number | null) => {
+      if (onQuestionRunningEnd) onQuestionRunningEnd(answer);
+    },
+    [onQuestionRunningEnd],
+  );
 
   return (
     <Transition
@@ -40,13 +60,16 @@ export const Player: React.FC<PlayerProps> = (props) => {
               key={i}
               data={{
                 number: i + 1,
-                time: q.timer,
-                text: q.text,
-                image: q.preview,
+                time: q.timeLimit,
+                text: q.title,
+                image: q.image,
                 answers: q.answers,
               }}
               shown={current === i && questionShown}
               onShowingEnd={handleQuestionShowingEnd}
+              runningState={questionRunningState}
+              onRunningEnd={handleQuestionRunningEnd}
+              rightAnswer={questionRightAnswer}
             />
           ))}
         </div>

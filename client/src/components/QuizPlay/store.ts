@@ -13,6 +13,8 @@ export type Question = {
   answers: string[];
 };
 
+type ShownState = 'entering' | 'entered' | 'exiting' | 'exited';
+
 const getQuiz = async (pin: number): Promise<Quiz> => {
   const [result] = await Promise.all([Axios.get(`http://localhost:3001/quiz/${pin}`), wait(500)]);
   return result.data.quiz;
@@ -26,6 +28,10 @@ const annotations: AnnotationsMap<QuizPlayPageStore, never> = {
   playerShownState: observable,
   questionShownState: observable,
   timerRunning: observable,
+  currentQuestion: observable,
+  questionRunningState: observable,
+  questionRightAnswer: observable,
+  resultsShownState: observable,
 
   handlePinPanelShowingEnd: action,
   handleNicknamePanelShowingEnd: action,
@@ -34,6 +40,8 @@ const annotations: AnnotationsMap<QuizPlayPageStore, never> = {
   handlePinEnterClick: action,
   handleTimerRunningEnd: action,
   handleNicknameBeginClick: action,
+  handleQuestionRunningEnd: action,
+  handleResultsShowingEnd: action,
 
   setQuiz: action,
   fetchQuiz: action,
@@ -44,15 +52,29 @@ export class QuizPlayPageStore extends Promiser {
 
   nickname?: string;
 
-  pinPanelShownState: 'entering' | 'entered' | 'exiting' | 'exited' = 'entered';
+  currentQuestion = 0;
 
-  nicknamePanelShownState: 'entering' | 'entered' | 'exiting' | 'exited' = 'exited';
+  questionRunningState: 'init' | 'running' | 'finished' = 'init';
 
-  playerShownState: 'entering' | 'entered' | 'exiting' | 'exited' = 'exited';
+  pinPanelShownState: ShownState = 'entered';
 
-  questionShownState: 'entering' | 'entered' | 'exiting' | 'exited' = 'exited';
+  nicknamePanelShownState: ShownState = 'exited';
+
+  playerShownState: ShownState = 'exited';
+
+  questionShownState: ShownState = 'exited';
 
   timerRunning = false;
+
+  questionRightAnswer: number | null = null;
+
+  resultsShownState: ShownState = 'exited';
+
+  results: {
+    top: number;
+    ladder: { nickname: string; score: [number, number] }[];
+    score: [number, number];
+  } | null = null;
 
   constructor() {
     super();
@@ -106,6 +128,20 @@ export class QuizPlayPageStore extends Promiser {
 
   handleTimerRunningEnd = () => {
     this.timerRunning = false;
+  };
+
+  handleQuestionRunningEnd = (answer: number | null) => {
+    console.log('answer', answer);
+    this.questionRunningState = 'finished';
+  };
+
+  handleResultsShowingEnd = () => {
+    if (this.resultsShownState === 'entering') {
+      this.resultsShownState = 'entered';
+      return;
+    }
+
+    this.resultsShownState = 'exited';
   };
 
   setQuiz(quiz: Quiz) {

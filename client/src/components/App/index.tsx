@@ -8,7 +8,6 @@ import { AppStore } from './store';
 import { Preloader } from '../Preloader';
 import { QuizzesPage } from '../QuizzesPage';
 import { QuizCreatingPage } from '../QuizCreatingPage';
-// import { QuizPlayPage } from '../QuizPlayPage';
 import { QuizPlayPage } from '../QuizPlay';
 import { QuizControlPage } from '../QuizControlPage';
 
@@ -28,6 +27,7 @@ export const App = observer(function App() {
 
   React.useEffect(() => {
     store.fetchData();
+    // eslint-disable-next-line no-console
     console.log(store);
   }, [store]);
 
@@ -77,13 +77,6 @@ export const App = observer(function App() {
             }}
           </Route>
           <Route path="/pupil/play" exact>
-            {/* <QuizPlayPage
-              onSelectAnswerClick={store.handleSelectAnswer}
-              onJoinQuizClick={store.handleJoinQuiz}
-              getQuizData={store.getQuizData}
-              getQuizCurrentState={store.getQuizCurrentState}
-            />
-            <div>Pupil</div> */}
             <QuizPlayPage />
           </Route>
           <Route>Error</Route>

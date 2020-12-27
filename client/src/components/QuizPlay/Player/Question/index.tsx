@@ -16,15 +16,26 @@ export type QuestionProps = {
   };
   shown?: boolean;
   onShowingEnd?: () => void;
-  rightAnswer?: number;
+  runningState?: 'init' | 'running' | 'finished';
+  onRunningEnd?: (answer: number | null) => void;
+  rightAnswer?: number | null;
 };
 
 const colors = ['green', 'blue', 'orange', 'purple'] as ('green' | 'blue' | 'orange' | 'purple')[];
 
 export const Question: React.FC<QuestionProps> = (props) => {
-  const { data, shown, onShowingEnd, rightAnswer } = props;
+  const { data, shown, onShowingEnd, rightAnswer, runningState, onRunningEnd } = props;
   const ref = React.useRef<HTMLDivElement>(null);
+  const [selected, setSelected] = React.useState<null | number>(null);
   const handleShowingEnd = useFunction(onShowingEnd);
+
+  const createHandleSelect = React.useCallback((i: number) => {
+    return () => setSelected(i);
+  }, []);
+
+  const handleRunEnd = React.useCallback(() => {
+    if (onRunningEnd) onRunningEnd(selected);
+  }, [onRunningEnd, selected]);
 
   return (
     <Transition
@@ -39,7 +50,14 @@ export const Question: React.FC<QuestionProps> = (props) => {
     >
       {(state) => (
         <div ref={ref} className={cn(style.main, style[`main_${state}`])}>
-          <div className={style.time} />
+          <div
+            className={style.time}
+            style={{
+              width: ['running', 'finished'].includes(runningState!) ? 0 : undefined,
+              transition: runningState === 'running' ? `width ${data.time}s linear` : undefined,
+            }}
+            onTransitionEnd={handleRunEnd}
+          />
           <div className={style.inner}>
             <div className={style.text}>
               <div className={style.number}>{data.number}</div>
@@ -50,7 +68,19 @@ export const Question: React.FC<QuestionProps> = (props) => {
             )}
             <div className={style.answers}>
               {data.answers.map((a, i) => (
-                <div key={i} className={style.answer}>
+                <div
+                  key={i}
+                  className={cn(
+                    style.answer,
+                    runningState === 'running' && style.answer_clickable,
+                    {
+                      [style.answer_blurred]: selected !== null && selected !== i,
+                      [style.answer_right]: rightAnswer !== null && rightAnswer === i,
+                      [style.answer_wrong]:
+                        rightAnswer !== null && rightAnswer !== i && selected === i,
+                    },
+                  )}
+                >
                   <SelectButton
                     classNames={{
                       main: style.answerMain,
@@ -61,6 +91,7 @@ export const Question: React.FC<QuestionProps> = (props) => {
                     variant={`${i + 1}`}
                     value={a}
                     color={colors[i]}
+                    onClick={createHandleSelect(i)}
                   />
                 </div>
               ))}

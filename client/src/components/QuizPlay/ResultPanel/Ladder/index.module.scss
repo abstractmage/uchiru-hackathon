@@ -1,0 +1,124 @@
+.main {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  &_entering {
+    transition: transform 500ms;
+    transform: none;
+  }
+
+  &_entered {
+    transform: none;
+  }
+
+  &_exiting {
+    transition: transform 500ms;
+    transform: translateY(100%);
+  }
+
+  &_exited {
+    transform: translateY(100%);
+  }
+}
+
+.inner {
+  display: flex;
+  width: 288px;
+  margin: 20px auto 80px;
+}
+
+.ladder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ladderTitle {
+  flex-grow: 0;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 22px;
+  color: #FFFFFF;
+  margin-bottom: 13px;
+}
+
+.ladderContent {
+  position: relative;
+  flex-grow: 1;
+}
+
+.ladderContentInner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ladderItem {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 24px;
+  padding: 2px 8px;
+  justify-content: space-between;
+  align-items: center;
+  
+  &:not(:last-child) {
+    margin-bottom: 8px;
+  }
+}
+
+.ladderItemNickname {
+  flex-grow: 1;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 20px;
+  color: #FFFFFF;
+}
+
+.ladderItemScore {
+  flex-grow: 0;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: right;
+  color: #FFFFFF;
+}
+
+.ladderItemProgress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: #FFFFFF;
+  opacity: 0.3;
+  border-radius: 3px;
+}
+
+.buttonWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+
+  .button {
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    line-height: 20px;
+    color: rgba(9, 21, 38, 0.85);
+  }
+}

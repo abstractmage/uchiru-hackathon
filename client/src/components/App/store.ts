@@ -98,6 +98,7 @@ export class AppStore {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getQuizRating(): any {
     return {
       quizRating: this.quizEventsManager.quizRating,
