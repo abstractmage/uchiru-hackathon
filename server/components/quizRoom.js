@@ -1,5 +1,3 @@
-const Quiz = require("../models/quiz");
-
 class QuizRoom {
   constructor(dataCollection) {
     this.pupils = {};
@@ -22,7 +20,7 @@ class QuizRoom {
         this.handlePupilsEvents(messageObject);
       }
     });
-    client.on('error', e => ws.send(e));
+    client.on('error', e => client.send(e));
   }
 
   handleTeacherEvents(messageObject) {
@@ -33,10 +31,9 @@ class QuizRoom {
         this.teacher.send(this.convertMessage({ message: `Quiz ${quizId} is active!`}));
         break;
       case 'show-question':
-        const { questionId } = messageObject;
         this.notifyPupils({
           eventName: 'show-question',
-          questionId: questionId,
+          questionId: messageObject.questionId,
         });
         this.teacher.send(this.convertMessage({ message: 'Pupils are notified!'}));
         break;
@@ -47,25 +44,14 @@ class QuizRoom {
 
   async handlePupilsEvents(messageObject) {
     console.log('handlePupilsEvents');
-    const { eventName, quizId } = messageObject;
+    const { eventName, questionId, answerId } = messageObject;
     switch (eventName) {
       case 'pupil-join':
-        // if (!this.activeQuizess[quizId]) {
-        //   this.pupils[messageObject.userName].send(this.convertMessage({ error: 'Подключение к неактивной викторине' }));
-        //   break;
-        // }
-        // const quizData = await this.dataCollection.findOne({ pin: Number(quizId) });
-        // if (!quizData) {
-        //   this.pupils[messageObject.userName].send(this.convertMessage({ error: 'Подключение к несуществующей викторине' }));
-        // } else {
-        //   this.pupils[messageObject.userName].send(this.convertMessage({ eventName: 'wait-for-quiz-activation', quizData: quizData }));
-        // }
-        // this.pupils[messageObject.userName].send(this.convertMessage({ eventName: 'wait-for-quiz-activation', quizData: quizData }));
         this.teacher.send(this.convertMessage({
           eventName: 'pupil-joined-quiz'
         }));
+        break;
       case 'select-answer':
-        const { questionId, answerId } = messageObject;
         if (!this.quizRating[messageObject.userName] ) {
           this.quizRating[messageObject.userName] = {};
         }
@@ -100,7 +86,6 @@ class QuizRoom {
       this.pupils[memberName].send(this.convertMessage(message));
     });
   }
-
-};
+}
 
 module.exports = QuizRoom;

@@ -20,7 +20,7 @@ const controllers = (collection) => {
     }
   };
 
-  const getQuiz = async (req, res, next) => {
+  const getQuiz = async (req, res) => {
     const { quizId } = req.params;
     if (quizId) {
       try {
@@ -34,7 +34,7 @@ const controllers = (collection) => {
     }
   };
 
-  const getAllQuizess = async (req, res, next) => {
+  const getAllQuizess = async (req, res) => {
     try {
       const quizzesCursor = await collection.find({});
       const result = [];
@@ -47,7 +47,7 @@ const controllers = (collection) => {
     }
   };
 
-  const updateQuiz = async (req, res, next) => {
+  const updateQuiz = async (req, res) => {
     try {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -69,10 +69,10 @@ const controllers = (collection) => {
   };
 
   return {
-    getAllQuizess: getAllQuizess,
-    getQuiz: getQuiz,
-    addQuiz: addQuiz,
-    updateQuiz: updateQuiz,
+    getAllQuizess,
+    getQuiz,
+    addQuiz,
+    updateQuiz,
   };
 };
 

@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use('/', mainRouter);
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
     res.status(400).json({
       error: error.message
     });
