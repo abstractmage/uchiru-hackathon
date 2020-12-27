@@ -26,7 +26,6 @@ export const QuizzesPage: React.FC<QuizzesPageProps> = (props) => {
     (pin: number) => {
       return () => onStartClick(pin);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onStartClick],
   );
 

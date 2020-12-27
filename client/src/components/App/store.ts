@@ -78,14 +78,8 @@ export class AppStore {
 
   getAvailablePin() {
     const pins = this.quizzes.map((q) => q.pin);
-    const minPin = Math.min(...pins);
-    let pin: number;
-
-    do {
-      pin = minPin + 1;
-    } while (pins.includes(pin));
-
-    return pin;
+    const maxPin = Math.max(...pins);
+    return maxPin + 1;
   }
 
   getQuizControlPageData(pin: number) {
@@ -152,29 +146,7 @@ export class AppStore {
   }
 
   handleQuizzesCreateClick = async () => {
-    this.disabled = true;
-    this.setPreloader(true, false);
-
-    const [res] = await Promise.all([
-      Axios.post('http://localhost:3001/teacher/add', {
-        pin: this.getAvailablePin(),
-        title: 'Моя викторина',
-        preview: '',
-        questions: [
-          {
-            title: '',
-            image: undefined,
-            answers: ['', '', '', ''],
-            rightAnswer: 0,
-            timeLimit: 20,
-          },
-        ],
-      }),
-      wait(1000),
-    ]);
-
-    this.disabled = false;
-    this.setPreloader(false, false);
+    this.setPage(`/teacher/quizzes/add`);
   };
 
   handleQuizzesChangeClick = (pin: number) => {
@@ -196,14 +168,14 @@ export class AppStore {
     this.quizEventsManager.selectAnswer(pin, quiestionId, selectedAnswer);
   };
 
-  handleQuizSave = ({
+  handleQuizSave = async ({
     id,
     pin,
     name,
     items,
   }: {
-    id: string;
-    pin: number;
+    id?: string;
+    pin?: number;
     name: string;
     items: Item[];
   }) => {
@@ -212,44 +184,64 @@ export class AppStore {
       visibility: false,
     };
 
-    const quiz = this.quizzes.find((q) => q._id === id);
+    if (id === undefined || pin === undefined) {
+      await Promise.all([
+        Axios.post('http://localhost:3001/teacher/add', {
+          pin: this.getAvailablePin(),
+          title: name,
+          preview: items[0].image || '',
+          questions: items.map((item) => ({
+            title: item.title,
+            image: item.image || '',
+            answers: item.variants.map((v) => v.value),
+            rightAnswer: item.variants.findIndex((v) => v.selected),
+            timeLimit: +item.time,
+          })),
+        }),
+        wait(1000),
+      ]);
+    } else {
+      const quiz = this.quizzes.find((q) => q._id === id);
 
-    if (!quiz) return;
+      if (!quiz) return;
 
-    quiz.title = name;
-    quiz.questions = quiz.questions.map((q, i) => ({
-      ...q,
-      title: items[i].title,
-      answers: items[i].variants.map((v) => v.value),
-      rightAnswer: items[i].variants.findIndex((v) => v.selected),
-      timeLimit: +items[i].time,
-    }));
+      quiz.title = name;
+      quiz.questions = quiz.questions.map((q, i) => ({
+        ...q,
+        title: items[i].title,
+        answers: items[i].variants.map((v) => v.value),
+        rightAnswer: items[i].variants.findIndex((v) => v.selected),
+        timeLimit: +items[i].time,
+      }));
 
-    Promise.all([
-      Axios.post(
-        `http://localhost:3001/teacher/edit/${pin}`,
-        {
-          pin,
-          updated: {
-            title: name,
-            preview: items[0].image || '',
-            questions: items.map((item) => ({
-              title: item.title,
-              image: item.image || '',
-              answers: item.variants.map((v) => v.value),
-              rightAnswer: item.variants.findIndex((v) => v.selected),
-              timeLimit: +item.time,
-            })),
+      await Promise.all([
+        Axios.post(
+          `http://localhost:3001/teacher/edit/${pin}`,
+          {
+            pin,
+            updated: {
+              title: name,
+              preview: items[0].image || '',
+              questions: items.map((item) => ({
+                title: item.title,
+                image: item.image || '',
+                answers: item.variants.map((v) => v.value),
+                rightAnswer: item.variants.findIndex((v) => v.selected),
+                timeLimit: +item.time,
+              })),
+            },
           },
-        },
-        { headers: { 'Access-Control-Allow-Origin': '*' } },
-      ),
-      wait(1000),
-    ]).then(() => {
-      this.setPreloader(false, false);
-      this.setDisabled(false);
-      this.setPage('/teacher/quizzes');
-    });
+          { headers: { 'Access-Control-Allow-Origin': '*' } },
+        ),
+        wait(1000),
+      ]);
+    }
+
+    await this.fetchData();
+
+    this.setPreloader(false, false);
+    this.setDisabled(false);
+    this.setPage('/teacher/quizzes');
   };
 }
 

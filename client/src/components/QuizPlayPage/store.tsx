@@ -17,13 +17,14 @@ export type Quiz = {
   preview: string;
 };
 
-
 export class QuizPlayPageStore {
-
   quiz: Quiz | null = null;
+
   quizLoaded = false;
+
   selectedPin = 0;
-  nickName: string = '';
+
+  nickName = '';
 
   constructor() {
     makeAutoObservable(this, {

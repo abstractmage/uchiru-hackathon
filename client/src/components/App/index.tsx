@@ -47,6 +47,9 @@ export const App = observer(function App() {
               onChangeClick={store.handleQuizzesChangeClick}
             />
           </Route>
+          <Route path="/teacher/quizzes/add" exact>
+            <QuizCreatingPage disabled={store.disabled} onSaveClick={store.handleQuizSave} />
+          </Route>
           <Route path="/teacher/quizzes/:id" exact>
             {({ match }) => {
               const pin = Number(match?.params.id);

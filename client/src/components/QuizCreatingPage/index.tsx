@@ -11,14 +11,14 @@ import { QuestionItem } from './QuestionItem';
 import { QuizCreatingPageStore, Item } from './store';
 
 export type QuizCreatingPageProps = {
-  quiz: {
+  quiz?: {
     id: string;
     pin: number;
     name: string;
     items: Item[];
   };
   disabled?: boolean;
-  onSaveClick?: (params: { id: string; pin: number; name: string; items: Item[] }) => void;
+  onSaveClick?: (params: { id?: string; pin?: number; name: string; items: Item[] }) => void;
 };
 
 const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'orange', 'purple'];
@@ -27,10 +27,12 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
   props,
 ) {
   const { quiz, onSaveClick, disabled } = props;
+  const quizId = quiz?.id;
+  const quizPin = quiz?.pin;
   const store = useLocalObservable(() => new QuizCreatingPageStore());
 
   React.useEffect(() => {
-    store.load(quiz);
+    if (quiz) store.load(quiz);
   }, [quiz, store]);
 
   const handleChangeQuizName = React.useCallback(
@@ -43,8 +45,8 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
 
   const handleSaveClick = React.useCallback(() => {
     if (onSaveClick)
-      onSaveClick({ id: quiz.id, pin: quiz.pin, name: store.name, items: store.items });
-  }, [onSaveClick, quiz.id, quiz.pin, store.items, store.name]);
+      onSaveClick({ id: quizId, pin: quizPin, name: store.name, items: store.items });
+  }, [onSaveClick, quizId, quizPin, store.name, store.items]);
 
   return (
     <div className={style.main}>
