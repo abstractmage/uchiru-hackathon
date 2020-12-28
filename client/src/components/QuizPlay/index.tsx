@@ -7,6 +7,8 @@ import { NicknamePanel } from './NicknamePanel';
 import { Player } from './Player';
 import { Timer } from '../Timer';
 import { ResultPanel } from './ResultPanel';
+import { ModalError } from '../ModalError';
+import { Waiting } from './Waiting';
 
 export const QuizPlayPage: React.FC = observer(function QuizPlayPage() {
   const store = useLocalObservable(() => new QuizPlayPageStore());
@@ -46,6 +48,13 @@ export const QuizPlayPage: React.FC = observer(function QuizPlayPage() {
         shown={['entered', 'entering'].includes(store.resultsShownState)}
         onShowingEnd={store.handleResultsShowingEnd}
         results={store.results}
+      />
+      {store.waitingStart && <Waiting />}
+      <ModalError
+        shown={store.modalError.shown}
+        message={store.modalError.message || undefined}
+        onCloseClick={store.handleModalErrorCloseClick}
+        onShowingEnd={store.handleModalErrorShowingEnd}
       />
     </div>
   );

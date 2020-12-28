@@ -46,12 +46,10 @@ export const Player: React.FC<PlayerProps> = (props) => {
     <Transition
       nodeRef={ref}
       in={shown}
-      timeout={500}
+      timeout={200}
       onEnter={() => ref.current?.offsetHeight}
       onEntered={handleShowingEnd}
       onExited={handleShowingEnd}
-      mountOnEnter
-      unmountOnExit
     >
       {(state) => (
         <div ref={ref} className={cn(style.main, style[`main_${state}`])}>
@@ -67,9 +65,9 @@ export const Player: React.FC<PlayerProps> = (props) => {
               }}
               shown={current === i && questionShown}
               onShowingEnd={handleQuestionShowingEnd}
-              runningState={questionRunningState}
+              runningState={current === i ? questionRunningState : undefined}
               onRunningEnd={handleQuestionRunningEnd}
-              rightAnswer={questionRightAnswer}
+              rightAnswer={current === i ? questionRightAnswer : undefined}
             />
           ))}
         </div>

@@ -17,7 +17,10 @@ export const PinPanel: React.FC<PinPanelProps> = (props) => {
   const ref = React.useRef<HTMLDivElement>(null);
   const [pinValues, setPinValues] = React.useState(['0', '0', '0', '0', '0', '0']);
 
-  const handleShowingEnd = useFunction(onShowingEnd);
+  const handleShowingEnd = React.useCallback(() => {
+    setPinValues(['0', '0', '0', '0', '0', '0']);
+    if (onShowingEnd) onShowingEnd();
+  }, [onShowingEnd]);
 
   const handleEnterClick = React.useCallback(() => {
     if (onEnterClick) onEnterClick(+pinValues.join(''));

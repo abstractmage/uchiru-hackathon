@@ -45,8 +45,6 @@ export const Question: React.FC<QuestionProps> = (props) => {
       onEnter={() => ref.current?.offsetHeight}
       onEntered={handleShowingEnd}
       onExited={handleShowingEnd}
-      mountOnEnter
-      unmountOnExit
     >
       {(state) => (
         <div ref={ref} className={cn(style.main, style[`main_${state}`])}>

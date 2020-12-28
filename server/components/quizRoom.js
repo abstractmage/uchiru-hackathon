@@ -44,6 +44,7 @@ class QuizRoom {
     this.currentQuestion = null;
   }
 
+  /** @param {WebSocket} client */
   listen(client) {
     client.on('message', (message) => {
       const messageObject = this.getMessage(message);
@@ -60,6 +61,19 @@ class QuizRoom {
     });
 
     client.on('error', e => client.send(e));
+    client.on('close', e => {
+      if (this.teacher && this.teacher.client === client) {
+        this.pupils.forEach((p) => {
+          p.client.send(this.convertMessage({
+            eventName: 'teacher-exited',
+          }));
+        });
+        this.pupils = [];
+        this.teacher = null;
+        this.quiz = null;
+        this.currentQuestion = null;
+      }
+    });
   }
 
   handleTeacherEvents(messageObject, client) {
@@ -247,8 +261,6 @@ class QuizRoom {
   }
 
   handlePupilsEvents(messageObject, client) {
-    if (this.teacher === null) return;
-
     const { eventName, ...params } = messageObject;
 
     switch (eventName) {
@@ -286,7 +298,18 @@ class QuizRoom {
   }
 
   handlePupilJoin({ nickname, pin, client }) {
-    if (this.quiz.pin !== pin) return;
+    if (this.quiz?.pin !== pin) {
+      console.log(123);
+      client.send(this.convertMessage({
+        eventName: 'pupil-join-fail',
+      }));
+      return;
+    }
+
+    client.send(this.convertMessage({
+      eventName: 'pupil-join-success',
+      quiz: this.quiz,
+    }));
 
     this.teacher.client.send(
       this.convertMessage({

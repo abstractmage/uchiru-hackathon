@@ -15,7 +15,11 @@ export const NicknamePanel: React.FC<NicknamePanelProps> = (props) => {
   const { shown, onBeginClick, onShowingEnd } = props;
   const ref = React.useRef<HTMLDivElement>(null);
   const [nickname, setNickname] = React.useState('');
-  const handleShowingEnd = useFunction(onShowingEnd);
+
+  const handleShowingEnd = React.useCallback(() => {
+    setNickname('');
+    if (onShowingEnd) onShowingEnd();
+  }, [onShowingEnd]);
 
   const handleBeginClick = React.useCallback(() => {
     if (onBeginClick) onBeginClick(nickname);

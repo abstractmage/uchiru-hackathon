@@ -22,6 +22,7 @@ const getQuiz = async (pin: number): Promise<Quiz> => {
 
 const annotations: AnnotationsMap<QuizPlayPageStore, never> = {
   quiz: observable,
+  pin: observable,
   nickname: observable,
   pinPanelShownState: observable,
   nicknamePanelShownState: observable,
@@ -33,6 +34,8 @@ const annotations: AnnotationsMap<QuizPlayPageStore, never> = {
   questionRightAnswer: observable,
   resultsShownState: observable,
   waitingStart: observable,
+  results: observable,
+  modalError: observable,
 
   handlePinPanelShowingEnd: action,
   handleNicknamePanelShowingEnd: action,
@@ -44,15 +47,22 @@ const annotations: AnnotationsMap<QuizPlayPageStore, never> = {
   handleQuestionRunningEnd: action,
   handleResultsShowingEnd: action,
   handleWebsocketMessage: action,
+  handleModalErrorCloseClick: action,
+  handleModalErrorShowingEnd: action,
 
+  showModalError: action,
+  hideModalError: action,
   setQuiz: action,
   fetchQuiz: action,
+  clear: action,
 };
 
 export class QuizPlayPageStore extends Promiser {
   ws: WebSocket;
 
   quiz?: Quiz;
+
+  pin?: number;
 
   nickname?: string;
 
@@ -82,6 +92,8 @@ export class QuizPlayPageStore extends Promiser {
     score: [number, number];
   } | null = null;
 
+  modalError: { shown: boolean; message: string | null } = { shown: false, message: null };
+
   constructor() {
     super();
 
@@ -95,7 +107,17 @@ export class QuizPlayPageStore extends Promiser {
     const data = JSON.parse(event.data);
 
     switch (data.eventName) {
+      case 'pupil-join-fail':
+        this.showModalError('Неверный ПИН-код викторины.');
+        break;
+
+      case 'pupil-join-success':
+        this.setQuiz(data.quiz);
+        this.waitingStart = true;
+        break;
+
       case 'start-timer':
+        this.waitingStart = false;
         this.timerRunning = true;
         break;
 
@@ -127,9 +149,36 @@ export class QuizPlayPageStore extends Promiser {
         };
         break;
 
+      case 'teacher-exited':
+        this.clear();
+        this.showModalError('Учитель отключился');
+        break;
+
       default:
         break;
     }
+  };
+
+  clear() {
+    this.quiz = undefined;
+    this.pin = undefined;
+    this.nickname = undefined;
+    this.currentQuestion = 0;
+    this.waitingStart = false;
+    this.questionRunningState = 'init';
+    this.pinPanelShownState = 'exited';
+    this.nicknamePanelShownState = 'exited';
+    this.playerShownState = 'exited';
+    this.questionShownState = 'exited';
+    this.timerRunning = false;
+    this.questionRightAnswer = null;
+    this.resultsShownState = 'exited';
+    this.results = null;
+    this.modalError = { shown: false, message: null };
+  }
+
+  handleModalErrorCloseClick = () => {
+    this.hideModalError();
   };
 
   handlePinPanelShowingEnd = () => {
@@ -160,6 +209,7 @@ export class QuizPlayPageStore extends Promiser {
   };
 
   handleQuestionShowingEnd = () => {
+    console.log('Question showing end');
     if (this.questionShownState === 'entering') {
       this.questionShownState = 'entered';
       this.ws.send(JSON.stringify({ type: 'pupil', eventName: 'question-shown' }));
@@ -172,15 +222,25 @@ export class QuizPlayPageStore extends Promiser {
     this.ws.send(JSON.stringify({ type: 'pupil', eventName: 'question-hidden' }));
   };
 
-  handlePinEnterClick = (pin: number) => {
-    this.fetchQuiz(pin);
+  handlePinEnterClick = async (pin: number) => {
+    this.pin = pin;
+
+    this.pinPanelShownState = 'exiting';
+    await this.setPromise(when(() => this.pinPanelShownState === 'exited'));
+
+    this.nicknamePanelShownState = 'entering';
   };
 
   handleNicknameBeginClick = (nickname: string) => {
     this.nickname = nickname;
     this.nicknamePanelShownState = 'exiting';
     this.ws.send(
-      JSON.stringify({ type: 'pupil', eventName: 'pupil-join', nickname, pin: this.quiz?.pin }),
+      JSON.stringify({
+        type: 'pupil',
+        eventName: 'pupil-join',
+        pin: this.pin,
+        nickname,
+      }),
     );
   };
 
@@ -203,6 +263,12 @@ export class QuizPlayPageStore extends Promiser {
     this.resultsShownState = 'exited';
   };
 
+  handleModalErrorShowingEnd = () => {
+    if (!this.modalError.shown) {
+      this.pinPanelShownState = 'entering';
+    }
+  };
+
   setQuiz(quiz: Quiz) {
     this.quiz = quiz;
   }
@@ -217,6 +283,14 @@ export class QuizPlayPageStore extends Promiser {
 
     this.nicknamePanelShownState = 'entering';
     await this.setPromise(when(() => this.nicknamePanelShownState === 'entered'));
+  }
+
+  showModalError(message: string) {
+    this.modalError = { shown: true, message };
+  }
+
+  hideModalError() {
+    this.modalError.shown = false;
   }
 
   cancel() {

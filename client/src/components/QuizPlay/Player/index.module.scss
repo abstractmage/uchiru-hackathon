@@ -7,7 +7,7 @@
   background: #fff;
 
   &_exiting {
-    transition: opacity 500ms;
+    transition: opacity 200ms;
     opacity: 0;
   }
 
@@ -16,7 +16,7 @@
   }
 
   &_entering {
-    transition: opacity 500ms;
+    transition: opacity 200ms;
     opacity: 1;
   }
 
