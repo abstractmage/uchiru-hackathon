@@ -43,12 +43,15 @@ const annotations: AnnotationsMap<QuizPlayPageStore, never> = {
   handleNicknameBeginClick: action,
   handleQuestionRunningEnd: action,
   handleResultsShowingEnd: action,
+  handleWebsocketMessage: action,
 
   setQuiz: action,
   fetchQuiz: action,
 };
 
 export class QuizPlayPageStore extends Promiser {
+  ws: WebSocket;
+
   quiz?: Quiz;
 
   nickname?: string;
@@ -83,7 +86,51 @@ export class QuizPlayPageStore extends Promiser {
     super();
 
     makeObservable(this, annotations);
+
+    this.ws = new WebSocket('ws://localhost:3001');
+    this.ws.onmessage = this.handleWebsocketMessage;
   }
+
+  handleWebsocketMessage = (event: MessageEvent) => {
+    const data = JSON.parse(event.data);
+
+    switch (data.eventName) {
+      case 'start-timer':
+        this.timerRunning = true;
+        break;
+
+      case 'show-question':
+        this.playerShownState = 'entering';
+        this.questionShownState = 'entering';
+        this.currentQuestion = data.index;
+        break;
+
+      case 'start-question':
+        this.questionRunningState = 'running';
+        break;
+
+      case 'question-results':
+        this.questionRightAnswer = data.rightAnswer;
+        break;
+
+      case 'hide-question':
+        this.questionShownState = 'exiting';
+        break;
+
+      case 'finish':
+        this.playerShownState = 'exiting';
+        this.resultsShownState = 'entering';
+        this.results = {
+          top: data.top,
+          ladder: data.ladder,
+          score: data.score,
+        };
+        break;
+
+      default:
+        break;
+    }
+  };
 
   handlePinPanelShowingEnd = () => {
     if (this.pinPanelShownState === 'entering') {
@@ -115,10 +162,14 @@ export class QuizPlayPageStore extends Promiser {
   handleQuestionShowingEnd = () => {
     if (this.questionShownState === 'entering') {
       this.questionShownState = 'entered';
+      this.ws.send(JSON.stringify({ type: 'pupil', eventName: 'question-shown' }));
       return;
     }
 
     this.questionShownState = 'exited';
+    this.questionRunningState = 'init';
+    this.questionRightAnswer = null;
+    this.ws.send(JSON.stringify({ type: 'pupil', eventName: 'question-hidden' }));
   };
 
   handlePinEnterClick = (pin: number) => {
@@ -127,16 +178,20 @@ export class QuizPlayPageStore extends Promiser {
 
   handleNicknameBeginClick = (nickname: string) => {
     this.nickname = nickname;
-    console.warn('join');
+    this.nicknamePanelShownState = 'exiting';
+    this.ws.send(
+      JSON.stringify({ type: 'pupil', eventName: 'pupil-join', nickname, pin: this.quiz?.pin }),
+    );
   };
 
   handleTimerRunningEnd = () => {
     this.timerRunning = false;
+    this.ws.send(JSON.stringify({ type: 'pupil', eventName: 'timer-end' }));
   };
 
   handleQuestionRunningEnd = (answer: number | null) => {
-    console.log('answer', answer);
     this.questionRunningState = 'finished';
+    this.ws.send(JSON.stringify({ type: 'pupil', eventName: 'timeout', answer }));
   };
 
   handleResultsShowingEnd = () => {
@@ -162,5 +217,10 @@ export class QuizPlayPageStore extends Promiser {
 
     this.nicknamePanelShownState = 'entering';
     await this.setPromise(when(() => this.nicknamePanelShownState === 'entered'));
+  }
+
+  cancel() {
+    super.cancel();
+    this.ws.close();
   }
 }

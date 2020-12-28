@@ -1,4 +1,4 @@
-import { makeAutoObservable, when } from 'mobx';
+import { makeAutoObservable, reaction, when } from 'mobx';
 import { makeCancelable } from '~/shared/helpers/make-cancellable';
 import { wait } from '~/shared/helpers/wait';
 
@@ -93,6 +93,15 @@ export class QuestionStore {
     this.setState('translated', [false, true]);
 
     await this.setPromise(when(() => !this.translated[1]));
+
+    this.setState('translated', [false, false]);
+    this.setState('numberShown', [true, false]);
+    this.setState('titleShown', [false, false]);
+    this.setState('mediaOpened', [false, false]);
+    this.setState('imageShown', [false, false]);
+    this.setState('statsShown', [false, false]);
+    this.setState('statsCalculated', [false, false]);
+    this.setState('variantsShown', [false, false]);
   }
 
   setState = (

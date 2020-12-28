@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx';
-import { wait } from '~/shared/helpers/wait';
 
 export type Question = {
   index: number;
@@ -22,15 +21,17 @@ export type Player = {
 };
 
 export class QuizControlPageStore {
+  ws: WebSocket;
+
   state: 'waiting' | 'countdown' | 'progress' | 'results' = 'waiting';
 
   players: Player[] = [];
 
-  lastQuestion: number | null = null;
-
   questionShown = false;
 
   currentQuestion: number | null = null;
+
+  questionRunning = false;
 
   questionAnimation: null | 'entering' | 'entered' | 'exiting' = null;
 
@@ -44,7 +45,48 @@ export class QuizControlPageStore {
 
   constructor() {
     makeAutoObservable(this);
+
+    this.ws = new WebSocket('ws://localhost:3001');
+    this.ws.onmessage = this.handleWebsocketMessage;
   }
+
+  handleWebsocketMessage = (event: MessageEvent) => {
+    const data = JSON.parse(event.data);
+
+    switch (data.eventName) {
+      case 'pupil-join':
+        this.addPlayer(data.nickname);
+        break;
+
+      case 'start-timer':
+        this.startCountDown();
+        break;
+
+      case 'show-question':
+        this.showQuestion(data.index);
+        break;
+
+      case 'start-question':
+        this.questionRunning = true;
+        break;
+
+      case 'question-results':
+        this.currentQuestionResult = { stats: data.stats, right: data.rightAnswer };
+        break;
+
+      case 'hide-question':
+        this.hideQuestion();
+        break;
+
+      case 'finish':
+        this.ladderShownState = 'entering';
+        this.ladderData = data.ladder;
+        break;
+
+      default:
+        break;
+    }
+  };
 
   setState(value: 'waiting' | 'countdown' | 'progress' | 'results') {
     this.state = value;
@@ -56,12 +98,20 @@ export class QuizControlPageStore {
 
   initQuiz = (quiz: Quiz) => {
     this.quiz = quiz;
-    console.warn('--- launch-quiz');
-    console.warn('--- wait-for-pupil-join');
+
+    this.ws.onopen = () => {
+      this.ws.send(
+        JSON.stringify({
+          eventName: 'wait-for-pupils',
+          type: 'teacher',
+          pin: quiz.pin,
+        }),
+      );
+    };
   };
 
   disposeQuiz = () => {
-    console.log('quiz disposed');
+    this.ws.close();
   };
 
   addPlayer(nickname: string) {
@@ -72,37 +122,37 @@ export class QuizControlPageStore {
     this.state = 'countdown';
   }
 
-  async startProgress() {
+  startProgress() {
     this.state = 'progress';
-    console.warn('--- activate-quiz');
-
-    await wait(500);
-
-    this.showQuestion();
   }
 
   handleStartClick = () => {
-    this.startCountDown();
+    this.ws.send(JSON.stringify({ type: 'teacher', eventName: 'launch-quiz' }));
   };
 
   handleCountDownEnd = () => {
     this.startProgress();
+    this.ws.send(JSON.stringify({ eventName: 'timer-end', type: 'teacher' }));
   };
 
   handleQuestionShown = () => {
     this.questionAnimation = 'entered';
+    this.ws.send(JSON.stringify({ type: 'teacher', eventName: 'question-shown' }));
   };
 
   handleQuestionHidden = () => {
     this.questionAnimation = null;
+    this.currentQuestionResult = null;
+    this.questionRunning = false;
+    this.ws.send(JSON.stringify({ type: 'teacher', eventName: 'question-hidden' }));
   };
 
   handleTimerEnd = () => {
-    console.log('timer end');
+    this.ws.send(JSON.stringify({ type: 'teacher', eventName: 'timeout' }));
   };
 
   handleButtonClick = () => {
-    console.log('button click');
+    this.ws.send(JSON.stringify({ type: 'teacher', eventName: 'finish-question' }));
   };
 
   handleLadderShowingEnd = () => {
@@ -114,11 +164,16 @@ export class QuizControlPageStore {
     this.ladderShownState = 'exited';
   };
 
-  showQuestion() {
-    console.warn('--- show-question');
-    if (this.currentQuestion === null) {
+  showQuestion(index?: number) {
+    if (index !== undefined) {
+      this.currentQuestion = index;
+    }
+
+    if (index === undefined && this.currentQuestion === null) {
       this.currentQuestion = 0;
-    } else {
+    }
+
+    if (index === undefined && this.currentQuestion !== null) {
       this.currentQuestion += 1;
     }
 

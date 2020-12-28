@@ -19,6 +19,7 @@ export type QuestionProps = {
   image?: string;
   answers: string[];
   result: { stats: number[]; right: number } | null;
+  questionRunning?: boolean;
   timer: number;
   onTimerEnd?: () => void;
 };
@@ -35,6 +36,7 @@ export const Question: React.FC<QuestionProps> = observer(function Question(prop
     image,
     answers,
     result,
+    questionRunning,
     timer,
     onTimerEnd,
   } = props;
@@ -59,6 +61,7 @@ export const Question: React.FC<QuestionProps> = observer(function Question(prop
   const mounted = React.useRef(false);
 
   React.useEffect(() => {
+    console.log(store);
     return store.cancel;
   }, [store]);
 
@@ -236,7 +239,7 @@ export const Question: React.FC<QuestionProps> = observer(function Question(prop
           <Timer
             shown={titleShown && !result}
             onShowingEnd={handleTimerShowingEnd}
-            value={titleShown && !titleShowing ? timer : null}
+            value={questionRunning ? timer : null}
             onTimerEnd={handleTimerEnd}
           />
         </div>

@@ -34,13 +34,14 @@ export const QuizControlPage: React.FC<QuizControlPageProps> = observer(function
             pin={store.quiz.pin}
             players={store.players}
             disabled={!store.players.length}
-            onStartClick={() => console.log(123)}
+            onStartClick={store.handleStartClick}
           />
         )}
         <Timer run={store.state === 'countdown'} onEnd={store.handleCountDownEnd} />
         <Viewer
           current={store.currentQuestion}
           questionShown={store.questionShown}
+          questionRunning={store.questionRunning}
           questions={store.quiz.questions}
           onQuestionShown={store.handleQuestionShown}
           onQuestionHidden={store.handleQuestionHidden}

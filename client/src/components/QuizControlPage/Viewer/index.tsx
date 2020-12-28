@@ -10,6 +10,7 @@ import { ReactComponent as ButtonSVG } from './svg/Button.svg';
 export type ViewerProps = {
   current: number | null;
   questionShown: boolean;
+  questionRunning?: boolean;
   questions: QuestionType[];
   onButtonClick: () => void;
   onQuestionShown: () => void;
@@ -25,6 +26,7 @@ export const Viewer: React.FC<ViewerProps> = function Viewer(props) {
   const {
     current,
     questionShown,
+    questionRunning,
     questions,
     onButtonClick,
     onQuestionHidden,
@@ -46,8 +48,9 @@ export const Viewer: React.FC<ViewerProps> = function Viewer(props) {
           text={q.text}
           image={q.preview}
           answers={q.answers}
-          result={result}
+          result={current === i ? result : null}
           timer={q.timer}
+          questionRunning={questionRunning}
         />
       ))}
       <div className={style.buttonContainer}>
