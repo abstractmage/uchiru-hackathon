@@ -32,6 +32,7 @@ const annotations: AnnotationsMap<QuizPlayPageStore, never> = {
   questionRunningState: observable,
   questionRightAnswer: observable,
   resultsShownState: observable,
+  waitingStart: observable,
 
   handlePinPanelShowingEnd: action,
   handleNicknamePanelShowingEnd: action,
@@ -53,6 +54,8 @@ export class QuizPlayPageStore extends Promiser {
   nickname?: string;
 
   currentQuestion = 0;
+
+  waitingStart = false;
 
   questionRunningState: 'init' | 'running' | 'finished' = 'init';
 
@@ -124,6 +127,7 @@ export class QuizPlayPageStore extends Promiser {
 
   handleNicknameBeginClick = (nickname: string) => {
     this.nickname = nickname;
+    console.warn('join');
   };
 
   handleTimerRunningEnd = () => {
@@ -157,6 +161,6 @@ export class QuizPlayPageStore extends Promiser {
     await this.setPromise(when(() => this.pinPanelShownState === 'exited'));
 
     this.nicknamePanelShownState = 'entering';
-    await this.setPromise(when(() => this.nicknamePanelShownState === 'exited'));
+    await this.setPromise(when(() => this.nicknamePanelShownState === 'entered'));
   }
 }

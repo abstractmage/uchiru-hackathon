@@ -10,6 +10,7 @@ export type LadderProps = {
   shown?: boolean;
   players: { nickname: string; score: [number, number] }[];
   onScoreButtonClick?: () => void;
+  onShowingEnd?: () => void;
 };
 
 const getPlayersProgress = (score: number[]) => {
@@ -32,7 +33,7 @@ const usePlayersProgress = (players: { nickname: string; score: [number, number]
 };
 
 export const Ladder: React.FC<LadderProps> = (props) => {
-  const { shown, players, onScoreButtonClick } = props;
+  const { shown, players, onScoreButtonClick, onShowingEnd } = props;
   const ref = React.useRef<HTMLDivElement>(null);
   const playersProgress = usePlayersProgress(players);
 
@@ -42,6 +43,8 @@ export const Ladder: React.FC<LadderProps> = (props) => {
       in={shown}
       timeout={500}
       onEnter={() => ref.current?.offsetHeight}
+      onEntered={onShowingEnd}
+      onExited={onShowingEnd}
       mountOnEnter
       unmountOnExit
     >

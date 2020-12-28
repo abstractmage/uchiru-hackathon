@@ -38,6 +38,10 @@ export class QuizControlPageStore {
 
   quiz: Quiz | null = null;
 
+  ladderData: { nickname: string; score: [number, number] }[] | null = null;
+
+  ladderShownState: 'entering' | 'entered' | 'exiting' | 'exited' = 'exited';
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -99,6 +103,15 @@ export class QuizControlPageStore {
 
   handleButtonClick = () => {
     console.log('button click');
+  };
+
+  handleLadderShowingEnd = () => {
+    if (this.ladderShownState === 'entering') {
+      this.ladderShownState = 'entered';
+      return;
+    }
+
+    this.ladderShownState = 'exited';
   };
 
   showQuestion() {

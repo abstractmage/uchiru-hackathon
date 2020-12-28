@@ -4,8 +4,8 @@ import style from './index.module.scss';
 import { Quiz, QuizControlPageStore } from './store';
 import { Timer } from '../Timer';
 import { Viewer } from './Viewer';
-import { Results } from './Viewer/Results';
 import { WaitRoom } from './WaitRoom';
+import { Ladder } from '../QuizPlay/ResultPanel/Ladder';
 
 export type QuizControlPageProps = {
   quiz: Quiz;
@@ -48,7 +48,13 @@ export const QuizControlPage: React.FC<QuizControlPageProps> = observer(function
           onButtonClick={store.handleButtonClick}
           result={store.currentQuestionResult}
         />
-        {store.state === 'results' && <Results />}
+        {store.ladderData && (
+          <Ladder
+            shown={['entering', 'entered'].includes(store.ladderShownState)}
+            onShowingEnd={store.handleLadderShowingEnd}
+            players={store.ladderData}
+          />
+        )}
       </div>
     )
   );
