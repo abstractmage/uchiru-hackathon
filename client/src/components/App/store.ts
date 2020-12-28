@@ -143,7 +143,7 @@ export class AppStore {
   handleQuizzesStartClick = (pin: number) => {
     this.quizEventsManager.init('teacher');
     this.quizEventsManager.launchQuiz(pin);
-    this.setPage(`/teacher/control/${pin}`);
+    this.setPage(`/teacher/play/${pin}`);
   };
 
   handleJoinQuiz = (nickName: string, pin: number) => {
