@@ -60,7 +60,7 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
   return (
     <div className={style.main}>
       <div className={style.quizName}>
-        <Button className={style.backButton} color="purple" onClick={handleBackClick}>
+        <Button className={style.backButton} onClick={handleBackClick}>
           Назад
         </Button>
         <input
