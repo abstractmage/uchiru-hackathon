@@ -155,6 +155,10 @@ export class AppStore {
     this.quizEventsManager.selectAnswer(pin, quiestionId, selectedAnswer);
   };
 
+  handleBackClick = () => {
+    this.page = '/teacher/quizzes';
+  };
+
   handleQuizSave = async ({
     id,
     pin,
@@ -193,12 +197,13 @@ export class AppStore {
       if (!quiz) return;
 
       quiz.title = name;
-      quiz.questions = quiz.questions.map((q, i) => ({
-        ...q,
-        title: items[i].title,
-        answers: items[i].variants.map((v) => v.value),
-        rightAnswer: items[i].variants.findIndex((v) => v.selected),
-        timeLimit: +items[i].time,
+      quiz.questions = items.map((item) => ({
+        _id: '',
+        title: item.title,
+        answers: item.variants.map((v) => v.value),
+        rightAnswer: item.variants.findIndex((v) => v.selected),
+        timeLimit: +item.time,
+        image: item.image || '',
       }));
 
       await Promise.all([

@@ -35,6 +35,7 @@ export const SelectButton: React.FC<SelectButtonProps> = (props) => {
     disabled,
   } = props;
   const ref = React.useRef<HTMLDivElement>(null);
+  const [focused, setFocused] = React.useState(false);
 
   const handleChange = React.useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,12 +53,17 @@ export const SelectButton: React.FC<SelectButtonProps> = (props) => {
     [disabled, onClick, variant],
   );
 
+  const handleFocus = React.useCallback(() => setFocused(true), []);
+  const handleBlur = React.useCallback(() => setFocused(false), []);
+
   return (
     <div
       className={cn(
         style.main,
         style[`main_color_${color}`],
         disabled && style.main_disabled,
+        editable && style.main_editable,
+        focused && style.main_focused,
         classNames?.main,
       )}
       onClick={handleClick}
@@ -66,10 +72,12 @@ export const SelectButton: React.FC<SelectButtonProps> = (props) => {
       <div className={cn(style.content, classNames?.content)}>
         {editable ? (
           <input
-            className={style.contentInner}
+            className={cn(style.contentInner, classNames?.contentInner)}
             onChange={handleChange}
             value={value}
             placeholder="Введите ответ"
+            onFocus={handleFocus}
+            onBlur={handleBlur}
           />
         ) : (
           <div className={cn(style.contentInner, classNames?.contentInner)}>{value}</div>

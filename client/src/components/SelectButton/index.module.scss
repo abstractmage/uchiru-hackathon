@@ -37,6 +37,18 @@
   &_disabled {
     pointer-events: none;
   }
+
+  &_editable {
+    body:not(:global(.touch)) & {
+      &:hover {
+        background: #F2F9FF;
+      }
+    }
+  }
+
+  &_focused {
+    background: #DEF0FF !important;
+  }
 }
 
 .variant {

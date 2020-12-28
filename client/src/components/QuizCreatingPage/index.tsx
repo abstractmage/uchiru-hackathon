@@ -9,6 +9,7 @@ import { Preview } from './Preview';
 import { QuestionHead } from './QuestionHead';
 import { QuestionItem } from './QuestionItem';
 import { QuizCreatingPageStore, Item } from './store';
+import { ModalError } from '../ModalError';
 
 export type QuizCreatingPageProps = {
   quiz?: {
@@ -19,6 +20,7 @@ export type QuizCreatingPageProps = {
   };
   disabled?: boolean;
   onSaveClick?: (params: { id?: string; pin?: number; name: string; items: Item[] }) => void;
+  onBackClick?: () => void;
 };
 
 const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'orange', 'purple'];
@@ -26,7 +28,7 @@ const colors: ('green' | 'blue' | 'orange' | 'purple')[] = ['green', 'blue', 'or
 export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(function QuizCreatingPage(
   props,
 ) {
-  const { quiz, onSaveClick, disabled } = props;
+  const { quiz, onSaveClick, onBackClick, disabled } = props;
   const quizId = quiz?.id;
   const quizPin = quiz?.pin;
   const store = useLocalObservable(() => new QuizCreatingPageStore());
@@ -44,13 +46,23 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
   );
 
   const handleSaveClick = React.useCallback(() => {
-    if (onSaveClick)
-      onSaveClick({ id: quizId, pin: quizPin, name: store.name, items: store.items });
-  }, [onSaveClick, quizId, quizPin, store.name, store.items]);
+    if (!onSaveClick) return;
+
+    if (!store.validate({ name: store.name, items: store.items })) return;
+
+    onSaveClick({ id: quizId, pin: quizPin, name: store.name, items: store.items });
+  }, [onSaveClick, store, quizId, quizPin]);
+
+  const handleBackClick = React.useCallback(() => {
+    if (onBackClick) onBackClick();
+  }, [onBackClick]);
 
   return (
     <div className={style.main}>
       <div className={style.quizName}>
+        <Button className={style.backButton} color="purple" onClick={handleBackClick}>
+          Назад
+        </Button>
         <input
           className={style.quizInput}
           placeholder="Название викторины"
@@ -73,6 +85,7 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
                   preview={item.image}
                   selected={item.index === store.selected}
                   onClick={store.handleItemClick}
+                  onCrossClick={store.handleItemCrossClick}
                 />
               ))}
               <AddButton onClick={store.handleAddClick} disabled={disabled} />
@@ -115,6 +128,11 @@ export const QuizCreatingPage: React.FC<QuizCreatingPageProps> = observer(functi
           </div>
         )}
       </div>
+      <ModalError
+        shown={store.modalError.shown}
+        message={store.modalError.message || undefined}
+        onCloseClick={store.handleModalCloseClick}
+      />
     </div>
   );
 });

@@ -1,4 +1,6 @@
-import { action, makeAutoObservable } from 'mobx';
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable guard-for-in */
+import { makeAutoObservable } from 'mobx';
 
 export type Variant = {
   variant: string;
@@ -50,24 +52,77 @@ export class QuizCreatingPageStore {
 
   selected: number | null = 0;
 
+  modalError: { shown: boolean; message: null | string } = {
+    shown: false,
+    message: null,
+  };
+
   get selectedItem() {
     return this.selected !== null ? this.items[this.selected] : null;
   }
 
   constructor() {
-    makeAutoObservable(this, {
-      handleChangeName: action,
-      handleItemChangeTime: action,
-      handleItemClick: action,
-      handleItemChangeTitle: action,
-      handleAddClick: action,
-    });
+    makeAutoObservable(this);
   }
 
   load({ name, items }: { name: string; items: Item[] }) {
     this.name = name;
     this.items = items;
   }
+
+  showModalError(message: string) {
+    this.modalError = { shown: true, message };
+  }
+
+  hideModalError() {
+    this.modalError.shown = false;
+  }
+
+  validate({ name, items }: { name: string; items: Item[] }) {
+    const nameFilled = !!name;
+
+    if (!nameFilled) {
+      this.showModalError('Необходимо ввести название викторины.');
+      return false;
+    }
+
+    for (const index in items) {
+      const item = items[index];
+      const itemTitleFilled = !!item.title;
+
+      if (!itemTitleFilled) {
+        this.showModalError(`Вопрос ${+index + 1}: необходимо ввести текст.`);
+        return false;
+      }
+
+      const timeFilled = !!item.time;
+
+      if (!timeFilled) {
+        this.showModalError(`Вопрос ${+index + 1}: необходимо ввести время для вопроса.`);
+        return false;
+      }
+
+      const everyVariantsFilled = item.variants.every((v) => !!v.value);
+
+      if (!everyVariantsFilled) {
+        this.showModalError(`Вопрос ${+index + 1}: необходимо ввести все варианты ответа.`);
+        return false;
+      }
+
+      const rightAnswerSelected = !!item.variants.find((v) => v.selected);
+
+      if (!rightAnswerSelected) {
+        this.showModalError(`Вопрос ${+index + 1}: необходимо выбрать правильный вариант ответа.`);
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  handleModalCloseClick = () => {
+    this.hideModalError();
+  };
 
   handleChangeName = (name: string) => {
     if (name.length <= 84) this.name = name;
@@ -87,6 +142,15 @@ export class QuizCreatingPageStore {
 
   handleItemClick = (index: number) => {
     this.selected = index;
+  };
+
+  handleItemCrossClick = (index: number) => {
+    this.items = this.items
+      .filter((item) => item.index !== index)
+      .map((item, i) => ({ ...item, index: i }));
+
+    if (this.items.length) this.selected = 0;
+    else this.selected = null;
   };
 
   handleAddClick = () => {
@@ -120,7 +184,9 @@ export class QuizCreatingPageStore {
       ],
     };
 
-    this.items.push(newItem);
+    this.selected = newItem.index;
+
+    this.items = this.items.concat(newItem);
   };
 
   handleChangeItemVariantValue = (variant: string, value: string) => {

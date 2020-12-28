@@ -52,6 +52,34 @@
   margin-bottom: 8px;
 }
 
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 20px;
+  height: 20px;
+  padding: 5px;
+  background: #000;
+  border-radius: 50%;
+  transition: opacity 200ms;
+  opacity: 0.4;
+  cursor: pointer;
+
+  body:not(:global(.touch)) & {
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
 .previewText {
   width: 100%;
   padding: 0 25px;

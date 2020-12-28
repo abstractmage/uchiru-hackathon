@@ -10,6 +10,7 @@ import { QuizzesPage } from '../QuizzesPage';
 import { QuizCreatingPage } from '../QuizCreatingPage';
 import { QuizPlayPage } from '../QuizPlay';
 import { QuizControlPage } from '../QuizControlPage';
+import { ModalError } from '../ModalError';
 
 const useRouting = (page: string) => {
   const history = useHistory();
@@ -48,7 +49,11 @@ export const App = observer(function App() {
             />
           </Route>
           <Route path="/teacher/quizzes/add" exact>
-            <QuizCreatingPage disabled={store.disabled} onSaveClick={store.handleQuizSave} />
+            <QuizCreatingPage
+              disabled={store.disabled}
+              onSaveClick={store.handleQuizSave}
+              onBackClick={store.handleBackClick}
+            />
           </Route>
           <Route path="/teacher/quizzes/:id" exact>
             {({ match }) => {
@@ -63,6 +68,7 @@ export const App = observer(function App() {
                   quiz={{ id: quiz._id, pin: quiz.pin, name: quiz.title, items }}
                   disabled={store.disabled}
                   onSaveClick={store.handleQuizSave}
+                  onBackClick={store.handleBackClick}
                 />
               );
             }}
