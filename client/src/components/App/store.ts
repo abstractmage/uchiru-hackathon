@@ -22,6 +22,7 @@ export class AppStore {
   };
 
   hostUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : '';
+  baseApiUrl = process.env.NODE_ENV === 'development' ? '' : '/api/v1';
 
   page = window.location.pathname;
 
@@ -92,7 +93,7 @@ export class AppStore {
   }
 
   getQuizData = async (pin: number): Promise<Quiz> => {
-    const [result] = await Promise.all([Axios.get(`${this.hostUrl}/quiz/${pin}`), wait(500)]);
+    const [result] = await Promise.all([Axios.get(`${this.hostUrl}${this.baseApiUrl}/quiz/${pin}`), wait(500)]);
     return result.data.quiz;
   };
 
@@ -121,7 +122,7 @@ export class AppStore {
   }
 
   async fetchData() {
-    await Promise.all([Axios.get(`${this.hostUrl}/teacher`), wait(500)]).then(([{ data }]) => {
+    await Promise.all([Axios.get(`${this.hostUrl}${this.baseApiUrl}/teacher`), wait(500)]).then(([{ data }]) => {
       const { quizess } = data;
       this.setLoadedData(quizess);
     });
@@ -180,7 +181,7 @@ export class AppStore {
 
     if (id === undefined || pin === undefined) {
       await Promise.all([
-        Axios.post(`${this.hostUrl}/teacher/add`, {
+        Axios.post(`${this.hostUrl}${this.baseApiUrl}/teacher/add`, {
           pin: this.getAvailablePin(),
           title: name,
           preview: items[0].image || '',
@@ -211,7 +212,7 @@ export class AppStore {
 
       await Promise.all([
         Axios.post(
-          `${this.hostUrl}/teacher/edit/${pin}`,
+          `${this.hostUrl}${this.baseApiUrl}/teacher/edit/${pin}`,
           {
             pin,
             updated: {
