@@ -21,6 +21,8 @@ export class AppStore {
     visibility: true,
   };
 
+  hostUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : '';
+
   page = window.location.pathname;
 
   quizzes: Quiz[] = [];
@@ -60,8 +62,11 @@ export class AppStore {
     }));
   }
 
-  getAvailablePin() {
+  getAvailablePin(): number {
     const pins = this.quizzes.map((q) => q.pin);
+    if (pins.length === 0) {
+      return 1111;
+    }
     const maxPin = Math.max(...pins);
     return maxPin + 1;
   }
@@ -87,7 +92,7 @@ export class AppStore {
   }
 
   getQuizData = async (pin: number): Promise<Quiz> => {
-    const [result] = await Promise.all([Axios.get(`http://localhost:3001/quiz/${pin}`), wait(500)]);
+    const [result] = await Promise.all([Axios.get(`${this.hostUrl}/quiz/${pin}`), wait(500)]);
     return result.data.quiz;
   };
 
@@ -116,12 +121,10 @@ export class AppStore {
   }
 
   async fetchData() {
-    await Promise.all([Axios.get('http://localhost:3001/teacher'), wait(500)]).then(
-      ([{ data }]) => {
-        const { quizess } = data;
-        this.setLoadedData(quizess);
-      },
-    );
+    await Promise.all([Axios.get(`${this.hostUrl}/teacher`), wait(500)]).then(([{ data }]) => {
+      const { quizess } = data;
+      this.setLoadedData(quizess);
+    });
   }
 
   setPreloader(shown: boolean, visibility: boolean) {
@@ -177,7 +180,7 @@ export class AppStore {
 
     if (id === undefined || pin === undefined) {
       await Promise.all([
-        Axios.post('http://localhost:3001/teacher/add', {
+        Axios.post(`${this.hostUrl}/teacher/add`, {
           pin: this.getAvailablePin(),
           title: name,
           preview: items[0].image || '',
@@ -208,7 +211,7 @@ export class AppStore {
 
       await Promise.all([
         Axios.post(
-          `http://localhost:3001/teacher/edit/${pin}`,
+          `${this.hostUrl}/teacher/edit/${pin}`,
           {
             pin,
             updated: {
@@ -236,20 +239,3 @@ export class AppStore {
     this.setPage('/teacher/quizzes');
   };
 }
-
-// axios.get('http://localhost:3001/teacher').then((res) => {
-//   const { quizess } = res.data;
-//   console.log('ALL QUIZESS', quizess);
-// });
-
-// axios.post('http://localhost:3001/teacher/edit/1111', {
-//   pin: 1111,
-//   updated: {
-//     title: 'UPDATED TITLE',
-//   },
-// });
-
-// axios.get('http://localhost:3001/quiz/1111').then((res) => {
-//   const { quiz } = res.data;
-//   console.log('SINGLE QUIZ', quiz);
-// });
