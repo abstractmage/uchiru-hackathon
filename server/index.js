@@ -15,21 +15,19 @@ const connectionParams={
 }
 mongoose.connect(process.env.DB_CONNECTION_URL, connectionParams);
 const kahootDb = mongoose.connection;
+kahootDb.on('error', console.error.bind(console, 'connection error:'));
 kahootDb.once("open", function() {
   console.log("MongoDB database connection established successfully");
 });
-
 const dataCollection = kahootDb.collection('Quizess');
-const mainRouter = router.getRouter(dataCollection);
+const appRouter = router.getRouter(dataCollection);
+
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-app.use('/', mainRouter);
-app.use((error, req, res) => {
-    res.status(400).json({
-      error: error.message
-    });
-});
+app.use('/', appRouter);
+
 
 const WebSocket = require('ws');
 const webSocketServer = new WebSocket.Server({ server });

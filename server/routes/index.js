@@ -12,6 +12,6 @@ const getRouter = (collection) => {
 };
 
 module.exports = {
-  getRouter: getRouter
+  getRouter
 };
 
