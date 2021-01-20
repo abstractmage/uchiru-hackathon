@@ -99,7 +99,7 @@ jobs:
               --progress=plain \
               --frontend dockerfile.v0 \
               --local context=. \
-              --local dockerfile=. \
+              --local dockerfile=server \
               --import-cache=type=local,src=$HOME/cache/ \
               --export-cache mode=min,type=local,dest=$HOME/cache/ \
               --output type=image,name=$REGISTRY/${GITHUB_REPOSITORY#uchiru/}:$IMAGE_TAG,push=true
