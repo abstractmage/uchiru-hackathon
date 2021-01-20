@@ -22,6 +22,7 @@ export class AppStore {
   };
 
   hostUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : '';
+
   baseApiUrl = process.env.NODE_ENV === 'development' ? '' : '/api/v1';
 
   page = window.location.pathname;
@@ -93,7 +94,10 @@ export class AppStore {
   }
 
   getQuizData = async (pin: number): Promise<Quiz> => {
-    const [result] = await Promise.all([Axios.get(`${this.hostUrl}${this.baseApiUrl}/quiz/${pin}`), wait(500)]);
+    const [result] = await Promise.all([
+      Axios.get(`${this.hostUrl}${this.baseApiUrl}/quiz/${pin}`),
+      wait(500),
+    ]);
     return result.data.quiz;
   };
 
@@ -122,10 +126,12 @@ export class AppStore {
   }
 
   async fetchData() {
-    await Promise.all([Axios.get(`${this.hostUrl}${this.baseApiUrl}/teacher`), wait(500)]).then(([{ data }]) => {
-      const { quizess } = data;
-      this.setLoadedData(quizess);
-    });
+    await Promise.all([Axios.get(`${this.hostUrl}${this.baseApiUrl}/teacher`), wait(500)]).then(
+      ([{ data }]) => {
+        const { quizess } = data;
+        this.setLoadedData(quizess);
+      },
+    );
   }
 
   setPreloader(shown: boolean, visibility: boolean) {
