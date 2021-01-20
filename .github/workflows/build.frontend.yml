@@ -1,0 +1,119 @@
+name: Build Frontend Image
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: build
+    env:
+      REGISTRY: registry-awsuchi.runit.cc
+      REGISTRY_CA_CRT: '${{ secrets.REGISTRY_UCHI_CA_CRT }}'
+      REGISTRY_CLIENT_CRT: '${{ secrets.REGISTRY_UCHI_CLIENT_CRT }}'
+      REGISTRY_CLIENT_KEY: '${{ secrets.REGISTRY_UCHI_CLIENT_KEY }}'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cache packages
+        id: cache_packages
+        uses: actions/cache@v2
+        with:
+          path: '~/packages'
+          key: packages-ls243-runc1rc10-bkit071
+          restore-keys: packages-
+
+      - name: Download buildkit and dependencies
+        if: steps.cache_packages.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/packages/buildkit ~/packages/runc ~/packages/libseccomp
+          pushd ~/packages/libseccomp
+          wget http://security.ubuntu.com/ubuntu/pool/main/libs/libseccomp/libseccomp2_2.4.3-1ubuntu3.20.04.3_amd64.deb -O libseccomp2.deb
+          sudo dpkg -i libseccomp2.deb
+          popd
+          pushd ~/packages/runc
+          wget https://github.com/opencontainers/runc/releases/download/v1.0.0-rc10/runc.amd64 -O runc
+          sudo chmod a+x runc
+          popd
+          pushd ~/packages/buildkit
+          wget https://github.com/moby/buildkit/releases/download/v0.7.1/buildkit-v0.7.1.linux-amd64.tar.gz -O buildkit.tar.gz
+          tar xzf buildkit.tar.gz && sudo chmod a+x ./bin/*
+          popd
+
+      - name: Install packages
+        run: |
+          (cd ~/packages/libseccomp && sudo dpkg -i libseccomp2.deb)
+          (cd ~/packages/runc       && sudo cp runc /bin/)
+          (cd ~/packages/buildkit   && sudo cp ./bin/* /bin/)
+
+      - name: Setup buildkit
+        run: |
+          sudo mkdir -p /etc/buildkit
+          cat <<EOF | sudo tee /etc/buildkit/buildkitd.toml > /dev/null
+          [registry."$REGISTRY"]
+            ca=["/etc/docker/certs.d/$REGISTRY/ca.crt"]
+            [[registry."$REGISTRY".keypair]]
+              key="/etc/docker/certs.d/$REGISTRY/client.key"
+              cert="/etc/docker/certs.d/$REGISTRY/client.cert"
+          EOF
+
+          if [ -f ~/.rvmrc ]; then
+            rm ~/.rvmrc
+          fi
+
+          sudo mkdir -p /etc/docker/certs.d/$REGISTRY/
+          echo $REGISTRY_CA_CRT     | base64 -d | sudo tee /etc/docker/certs.d/$REGISTRY/ca.crt      >/dev/null
+          echo $REGISTRY_CLIENT_CRT | base64 -d | sudo tee /etc/docker/certs.d/$REGISTRY/client.cert >/dev/null
+          echo $REGISTRY_CLIENT_KEY | base64 -d | sudo tee /etc/docker/certs.d/$REGISTRY/client.key  >/dev/null
+          mkdir -p ~/cache
+          sudo mkdir -p /var/lib/buildkit
+          sudo chown $USER -R /var/lib/buildkit
+
+      - name: Restore build cache
+        uses: actions/cache@v2
+        with:
+          path: '~/cache'
+          key: cache-v1-${{ github.run_id }}
+          restore-keys: cache-v1-
+
+      - name: Restore buildkitd mount cache
+        uses: actions/cache@v2
+        with:
+          path: '/var/lib/buildkit'
+          key: buildkit-v1-${{ github.run_id }}
+          restore-keys: buildkit-v1-
+
+      - name: Launch buildkit daemon
+        timeout-minutes: 1
+        run: |
+          sudo buildkitd &>/dev/null &
+          until sudo buildctl debug workers >/dev/null 2>&1; do sleep 1s; done
+
+      - uses: actions/checkout@v2
+
+      - name: Build and push docker image
+        run: |
+          export IMAGE_TAG="$(echo ${GITHUB_REF#refs/heads/} | tr -s '[:punct:]' '-')-${GITHUB_RUN_NUMBER}-${GITHUB_SHA:0:8}"
+          if [ $GITHUB_EVENT_NAME = "schedule" ]; then export IMAGE_TAG="periodic-$(date +%Y%m%d%H%M)-${GITHUB_SHA:0:8}"; fi
+          sudo buildctl \
+            build \
+              --progress=plain \
+              --frontend dockerfile.v0 \
+              --local context=client \
+              --local dockerfile=client \
+              --import-cache=type=local,src=$HOME/cache/ \
+              --export-cache mode=min,type=local,dest=$HOME/cache/ \
+              --output type=image,name=$REGISTRY/${GITHUB_REPOSITORY#uchiru/}:$IMAGE_TAG,push=true
+
+      - name: Prune build cache
+        if: '${{ success() || failure() }}'
+        run: sudo buildctl prune --filter type==regular
+
+      - name: Stop buildkit daemon
+        if: '${{ success() || failure() }}'
+        timeout-minutes: 1
+        run: |
+          sudo pkill buildkitd
+          while sudo buildctl debug workers >/dev/null 2>&1; do sleep 1s; done
+
+      - name: Change buildkit cache permissions
+        if: '${{ success() || failure() }}'
+        run: sudo chown $USER -R /var/lib/buildkit
