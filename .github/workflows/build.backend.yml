@@ -1,4 +1,4 @@
-name: Build Image
+name: Build Backend Image
 on:
   push: {}
   workflow_dispatch: {}
