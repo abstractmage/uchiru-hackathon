@@ -1,6 +1,5 @@
 name: Build Backend Image
 on:
-  push: {}
   workflow_dispatch: {}
 
 jobs:
