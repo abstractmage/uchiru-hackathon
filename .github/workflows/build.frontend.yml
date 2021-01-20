@@ -97,7 +97,7 @@ jobs:
             build \
               --progress=plain \
               --frontend dockerfile.v0 \
-              --local context=. \
+              --local context=client \
               --local dockerfile=client \
               --import-cache=type=local,src=$HOME/cache/ \
               --export-cache mode=min,type=local,dest=$HOME/cache/ \
